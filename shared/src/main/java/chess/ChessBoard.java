@@ -9,7 +9,7 @@ package chess;
 public class ChessBoard {
 
     public ChessBoard() {
-        
+        pieces = new ChessPiece[8][8];
     }
 
     /**
@@ -19,7 +19,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        pieces[r][c] = piece;
     }
 
     /**
@@ -30,7 +32,10 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        //If there is no piece at that place on the board, is null?
+        return pieces[r][c];
     }
 
     /**
@@ -38,6 +43,76 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        //TODO: Add clear function?
+
+        ChessPiece tempPiece;
+        ChessPosition tempPos;
+        //Black Pawns
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        for(int a = 1; a <= 8; a++){
+            tempPos = new ChessPosition(7,a);
+            addPiece(tempPos, tempPiece);
+        }
+        //White Pawns
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        for(int a = 1; a <= 8; a++){
+            tempPos = new ChessPosition(2,a);
+            addPiece(tempPos, tempPiece);
+        }
+
+        //Rooks
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        tempPos = new ChessPosition(8,1);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(8,8);
+        addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        tempPos = new ChessPosition(1,1);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(1,8);
+        addPiece(tempPos, tempPiece);
+
+        //Knights
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        tempPos = new ChessPosition(8,2);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(8,7);
+        addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        tempPos = new ChessPosition(1,2);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(1,7);
+        addPiece(tempPos, tempPiece);
+
+        //Bishops
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        tempPos = new ChessPosition(8,3);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(8,6);
+        addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        tempPos = new ChessPosition(1,3);
+        addPiece(tempPos, tempPiece);
+        tempPos = new ChessPosition(1,6);
+        addPiece(tempPos, tempPiece);
+
+        //Queens
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        tempPos = new ChessPosition(8,4);
+        addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        tempPos = new ChessPosition(1,4);
+        addPiece(tempPos, tempPiece);
+
+        //Kings
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        tempPos = new ChessPosition(8,5);
+        addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        tempPos = new ChessPosition(1,5);
+        addPiece(tempPos, tempPiece);
+
     }
+
+    private ChessPiece pieces[][];
 }
