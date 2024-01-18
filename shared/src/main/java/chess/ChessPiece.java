@@ -49,7 +49,37 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        //Get Piece in that position on that board
+        ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
+        switch (type){
+            case PAWN:
+                MoveCheck checkPawn = new MoveCheckPawn();
+                checkPawn.pieceMoves(board, myPosition);
+                break;
+            case BISHOP:
+                MoveCheck checkBishop = new MoveCheckBishop();
+                checkBishop.pieceMoves(board, myPosition);
+                break;
+            case ROOK:
+                MoveCheck checkRook = new MoveCheckRook();
+                checkRook.pieceMoves(board, myPosition);
+                break;
+            case KNIGHT:
+                MoveCheck checkKnight = new MoveCheckKnight();
+                checkKnight.pieceMoves(board, myPosition);
+                break;
+            case QUEEN:
+                MoveCheck checkQueen = new MoveCheckQueen();
+                checkQueen.pieceMoves(board, myPosition);
+                break;
+            case KING:
+                MoveCheck checkKing = new MoveCheckKing();
+                checkKing.pieceMoves(board, myPosition);
+                break;
+        }
+        //Calculate possible moves based on type
+        //If Pawn, check for promotion (each is a separate move)
+        //Return Collection
     }
 
     private ChessGame.TeamColor color;

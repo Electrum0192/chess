@@ -34,7 +34,7 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int r = position.getRow() - 1;
         int c = position.getColumn() - 1;
-        //If there is no piece at that place on the board, is null?
+
         return pieces[r][c];
     }
 
@@ -111,7 +111,6 @@ public class ChessBoard {
         tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
         tempPos = new ChessPosition(1,5);
         addPiece(tempPos, tempPiece);
-
     }
 
     private ChessPiece pieces[][];
