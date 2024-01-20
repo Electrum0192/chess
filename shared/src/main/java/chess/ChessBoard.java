@@ -59,18 +59,19 @@ public class ChessBoard {
      */
     public void resetBoard() {
         //TODO: Add clear function?
+        //Note: Not sure if extra new class calls are redundant, but leaving them for now just in case.
 
         ChessPiece tempPiece;
         ChessPosition tempPos;
         //Black Pawns
-        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         for(int a = 1; a <= 8; a++){
+            tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
             tempPos = new ChessPosition(7,a);
             addPiece(tempPos, tempPiece);
         }
         //White Pawns
-        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         for(int a = 1; a <= 8; a++){
+            tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             tempPos = new ChessPosition(2,a);
             addPiece(tempPos, tempPiece);
         }
@@ -79,11 +80,13 @@ public class ChessBoard {
         tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         tempPos = new ChessPosition(8,1);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         tempPos = new ChessPosition(8,8);
         addPiece(tempPos, tempPiece);
         tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
         tempPos = new ChessPosition(1,1);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
         tempPos = new ChessPosition(1,8);
         addPiece(tempPos, tempPiece);
 
@@ -91,11 +94,13 @@ public class ChessBoard {
         tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         tempPos = new ChessPosition(8,2);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         tempPos = new ChessPosition(8,7);
         addPiece(tempPos, tempPiece);
         tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
         tempPos = new ChessPosition(1,2);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
         tempPos = new ChessPosition(1,7);
         addPiece(tempPos, tempPiece);
 
@@ -103,11 +108,13 @@ public class ChessBoard {
         tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         tempPos = new ChessPosition(8,3);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         tempPos = new ChessPosition(8,6);
         addPiece(tempPos, tempPiece);
         tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
         tempPos = new ChessPosition(1,3);
         addPiece(tempPos, tempPiece);
+        tempPiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
         tempPos = new ChessPosition(1,6);
         addPiece(tempPos, tempPiece);
 
