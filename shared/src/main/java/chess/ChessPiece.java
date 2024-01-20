@@ -51,35 +51,36 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //Get Piece in that position on that board
         ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
+        //Call MoveCheck of that type to get collection
+        Collection<ChessMove> moves = null;
         switch (type){
             case PAWN:
                 MoveCheck checkPawn = new MoveCheckPawn();
-                checkPawn.pieceMoves(board, myPosition);
+                moves = checkPawn.pieceMoves(board, myPosition);
                 break;
             case BISHOP:
                 MoveCheck checkBishop = new MoveCheckBishop();
-                checkBishop.pieceMoves(board, myPosition);
+                moves = checkBishop.pieceMoves(board, myPosition);
                 break;
             case ROOK:
                 MoveCheck checkRook = new MoveCheckRook();
-                checkRook.pieceMoves(board, myPosition);
+                moves = checkRook.pieceMoves(board, myPosition);
                 break;
             case KNIGHT:
                 MoveCheck checkKnight = new MoveCheckKnight();
-                checkKnight.pieceMoves(board, myPosition);
+                moves = checkKnight.pieceMoves(board, myPosition);
                 break;
             case QUEEN:
                 MoveCheck checkQueen = new MoveCheckQueen();
-                checkQueen.pieceMoves(board, myPosition);
+                moves = checkQueen.pieceMoves(board, myPosition);
                 break;
             case KING:
                 MoveCheck checkKing = new MoveCheckKing();
-                checkKing.pieceMoves(board, myPosition);
+                moves = checkKing.pieceMoves(board, myPosition);
                 break;
         }
-        //Calculate possible moves based on type
-        //If Pawn, check for promotion (each is a separate move)
         //Return Collection
+        return moves;
     }
 
     private ChessGame.TeamColor color;

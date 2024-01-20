@@ -7,5 +7,6 @@ public class MoveCheck {
         //Calculate possible moves based on type
         //If Pawn, check for promotion (each is a separate move)
         //Return Collection
+        return null;
     }
 }
