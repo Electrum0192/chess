@@ -70,7 +70,11 @@ public class ChessPiece {
         switch (type){
             case PAWN:
                 MoveCheck checkPawn = new MoveCheckPawn();
-                moves = checkPawn.pieceMoves(board, myPosition);
+                if(board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    moves = checkPawn.whiteMoves(board, myPosition);
+                }else{
+                    moves = checkPawn.blackMoves(board, myPosition);
+                }
                 break;
             case BISHOP:
                 MoveCheck checkBishop = new MoveCheckBishop();
