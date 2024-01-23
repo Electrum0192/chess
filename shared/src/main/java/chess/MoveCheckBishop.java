@@ -43,12 +43,8 @@ public class MoveCheckBishop extends MoveCheck{
             capture = true;
         }
 
-        System.out.println("target: "+target.getRow()+" "+target.getColumn());
-        System.out.println("isValid:"+isValid+",capture:"+capture+"\n");
-
         //Add move
         if(isValid){
-            System.out.println("Added\n");
             ChessMove bishopMove = new ChessMove(start, target, null);
             moves.add(bishopMove);
         }
