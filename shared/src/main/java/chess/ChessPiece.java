@@ -12,8 +12,8 @@ import java.util.Objects;
 public class ChessPiece {
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.color = pieceColor;
         this.type = type;
+        this.team = pieceColor;
     }
 
     @Override
@@ -21,12 +21,12 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return color == that.color && type == that.type;
+        return team == that.team && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, type);
+        return Objects.hash(team, type);
     }
 
     /**
@@ -45,14 +45,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return color;
+        return this.team;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return type;
+        return this.type;
     }
 
     /**
@@ -63,44 +63,47 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //Get Piece in that position on that board
-        ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
-        //Call MoveCheck of that type to get collection
         Collection<ChessMove> moves = null;
+        ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
         switch (type){
-            case PAWN:
-                MoveCheck checkPawn = new MoveCheckPawn();
+            case PAWN:{
+                FindMoves finder = new PawnMoves();
                 if(board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    moves = checkPawn.whiteMoves(board, myPosition);
+                    moves = finder.whiteMoves(board, myPosition);
                 }else{
-                    moves = checkPawn.blackMoves(board, myPosition);
+                    moves = finder.blackMoves(board,myPosition);
                 }
                 break;
-            case BISHOP:
-                MoveCheck checkBishop = new MoveCheckBishop();
-                moves = checkBishop.pieceMoves(board, myPosition);
+            }
+            case ROOK:{
+                FindMoves finder = new RookMoves();
+                moves = finder.getMoves(board,myPosition);
                 break;
-            case ROOK:
-                MoveCheck checkRook = new MoveCheckRook();
-                moves = checkRook.pieceMoves(board, myPosition);
+            }
+            case KNIGHT:{
+                FindMoves finder = new KnightMoves();
+                moves = finder.getMoves(board,myPosition);
                 break;
-            case KNIGHT:
-                MoveCheck checkKnight = new MoveCheckKnight();
-                moves = checkKnight.pieceMoves(board, myPosition);
+            }
+            case BISHOP:{
+                FindMoves finder = new BishopMoves();
+                moves = finder.getMoves(board,myPosition);
                 break;
-            case QUEEN:
-                MoveCheck checkQueen = new MoveCheckQueen();
-                moves = checkQueen.pieceMoves(board, myPosition);
+            }
+            case QUEEN:{
+                FindMoves finder = new QueenMoves();
+                moves = finder.getMoves(board,myPosition);
                 break;
-            case KING:
-                MoveCheck checkKing = new MoveCheckKing();
-                moves = checkKing.pieceMoves(board, myPosition);
+            }
+            case KING:{
+                FindMoves finder = new KingMoves();
+                moves = finder.getMoves(board,myPosition);
                 break;
+            }
         }
-        //Return Collection
         return moves;
     }
 
-    private ChessGame.TeamColor color;
+    private ChessGame.TeamColor team;
     private ChessPiece.PieceType type;
 }
