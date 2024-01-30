@@ -30,8 +30,8 @@ public class ChessBoard {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for(int a = 0; a < 8; a++){
-            for(int b = 0; b < 8; b++){
+        for(int a = 7; a >= 0; a--){
+            for(int b = 7; b >= 0; b--){
                 builder.append('|');
                 if(pieces[a][b] == null){
                     builder.append(' ');
