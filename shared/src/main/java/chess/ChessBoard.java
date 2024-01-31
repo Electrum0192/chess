@@ -113,6 +113,23 @@ public class ChessBoard {
     }
 
     /**
+     * Moves a piece on the board. If the piece is capturing, it will override the piece at the destination.
+     *
+     * @param startPosition location of the piece to move
+     * @param endPosition   the piece to add
+     */
+    public void movePiece(ChessPosition startPosition, ChessPosition endPosition) {
+        int sRow = startPosition.getRow();
+        int sColumn = startPosition.getColumn();
+        int eRow = endPosition.getRow();
+        int eColumn = endPosition.getColumn();
+
+        ChessPiece piece = pieces[sRow-1][sColumn-1];
+        pieces[eRow-1][eColumn-1] = piece;
+        pieces[sRow-1][sColumn-1] = null;
+    }
+
+    /**
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
