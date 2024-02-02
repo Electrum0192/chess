@@ -117,18 +117,20 @@ public class ChessBoard {
     /**
      * Moves a piece on the board. If the piece is capturing, it will override the piece at the destination.
      *
-     * @param startPosition location of the piece to move
-     * @param endPosition   the piece to add
+     * @param move The move to make
      */
-    public void movePiece(ChessPosition startPosition, ChessPosition endPosition) {
-        int sRow = startPosition.getRow();
-        int sColumn = startPosition.getColumn();
-        int eRow = endPosition.getRow();
-        int eColumn = endPosition.getColumn();
+    public void movePiece(ChessMove move) {
+        int sRow = move.getStartPosition().getRow();
+        int sColumn = move.getStartPosition().getColumn();
+        int eRow = move.getEndPosition().getRow();
+        int eColumn = move.getEndPosition().getColumn();
 
         ChessPiece piece = pieces[sRow-1][sColumn-1];
+        //System.out.println(this.toString());
         pieces[eRow-1][eColumn-1] = piece;
+        //System.out.println(this.toString());
         pieces[sRow-1][sColumn-1] = null;
+        //System.out.println(this.toString());
     }
 
     /**
@@ -164,6 +166,43 @@ public class ChessBoard {
             }
         }
         return locations;
+    }
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to check for check
+     * @return True if the specified team is in check
+     */
+    public boolean isInCheck(ChessGame.TeamColor teamColor) {
+        //Get enemy color
+        ChessGame.TeamColor enemy;
+        if(teamColor == ChessGame.TeamColor.WHITE){enemy = ChessGame.TeamColor.BLACK;}else enemy = ChessGame.TeamColor.WHITE;
+
+        //Search board for enemy pieces and get their moves
+        Collection<ChessPosition> places = this.getTeam(enemy);
+        for(var i : places){
+            Collection<ChessMove> possibleMoves = this.getPiece(i).pieceMoves(this,i);
+            //Check each move to see if it could capture the King
+            for(var j : possibleMoves){
+                if(this.getPiece(j.getEndPosition()) != null){
+                    if(this.getPiece(j.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING){
+                        System.out.println("King at "+j.getEndPosition().toString());
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void copyBoard(ChessBoard board){
+        for(int r = 1; r <= 8; r++){
+            for(int c = 1; c <= 8; c++){
+                this.pieces[r-1][c-1] = board.getPiece(new ChessPosition(r,c));
+            }
+        }
     }
 
     /**

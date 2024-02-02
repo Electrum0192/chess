@@ -1,6 +1,9 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -48,7 +51,39 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        //Is there a piece there?
+        if(currentBoard.getPiece(startPosition) == null){
+            return null;
+        }
+        /**
+         * Breaks the tests. Grumble Grumble.
+        //Is it the correct player's turn?
+        if(currentBoard.getPiece(startPosition).getTeamColor() != activePlayer){
+            return new HashSet<ChessMove>(); //Empty set, because there are no valid moves
+        }
+         **/
+        //Get moves for that piece
+        Collection<ChessMove> allMoves = currentBoard.getPiece(startPosition).pieceMoves(currentBoard, startPosition);
+        HashSet<ChessMove> goodMoves = new HashSet<ChessMove>();
+        //Check if each move would put you in check
+        TeamColor pieceColor = currentBoard.getPiece(startPosition).getTeamColor();
+        for(var i : allMoves){
+            //Create a copy board and test it
+            ChessBoard testBoard = new ChessBoard();
+            testBoard.copyBoard(currentBoard);
+            testBoard.movePiece(i);
+            System.out.println("CURRENT:\n"+currentBoard.toString());
+            if(!testBoard.isInCheck(pieceColor)){
+                goodMoves.add(i);
+            }else{
+                System.out.println("FLAG: IN CHECK - " + i.toString());
+            }
+            System.out.println("Move:\n"+testBoard.toString());
+
+            //TODO add piece-conversion to movePiece
+        }
+
+        return goodMoves;
     }
 
     /**
@@ -80,6 +115,7 @@ public class ChessGame {
             for(var j : possibleMoves){
                 if(currentBoard.getPiece(j.getEndPosition()) != null){
                     if(currentBoard.getPiece(j.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING){
+                        System.out.println("King at "+j.getEndPosition().toString());
                         return true;
                     }
                 }
