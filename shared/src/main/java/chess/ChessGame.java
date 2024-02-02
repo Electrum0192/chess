@@ -103,26 +103,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //Get enemy color
-        TeamColor enemy;
-        if(teamColor == TeamColor.WHITE){enemy = TeamColor.BLACK;}else enemy = TeamColor.WHITE;
-
-        //Search board for enemy pieces and get their moves
-        Collection<ChessPosition> places = currentBoard.getTeam(enemy);
-        for(var i : places){
-            Collection<ChessMove> possibleMoves = currentBoard.getPiece(i).pieceMoves(currentBoard,i);
-            //Check each move to see if it could capture the King
-            for(var j : possibleMoves){
-                if(currentBoard.getPiece(j.getEndPosition()) != null){
-                    if(currentBoard.getPiece(j.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING){
-                        System.out.println("King at "+j.getEndPosition().toString());
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return currentBoard.isInCheck(teamColor);
     }
 
     /**
