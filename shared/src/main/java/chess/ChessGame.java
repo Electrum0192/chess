@@ -103,7 +103,7 @@ public class ChessGame {
             throw new InvalidMoveException();
         }else{
             currentBoard.movePiece(move);
-            System.out.println(currentBoard.toString());
+            //System.out.println(currentBoard.toString());
             //Change turn
             if(activePlayer == TeamColor.WHITE){
                 activePlayer = TeamColor.BLACK;

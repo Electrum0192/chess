@@ -131,6 +131,11 @@ public class ChessBoard {
         //System.out.println(this.toString());
         pieces[sRow-1][sColumn-1] = null;
         //System.out.println(this.toString());
+
+        //Promotion, if applicable
+        if(move.getPromotionPiece() != null){
+            pieces[eRow-1][eColumn-1].setPieceType(move.getPromotionPiece());
+        }
     }
 
     /**
