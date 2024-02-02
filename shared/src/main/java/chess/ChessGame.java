@@ -72,13 +72,10 @@ public class ChessGame {
             ChessBoard testBoard = new ChessBoard();
             testBoard.copyBoard(currentBoard);
             testBoard.movePiece(i);
-            System.out.println("CURRENT:\n"+currentBoard.toString());
+            //System.out.println("CURRENT:\n"+currentBoard.toString());
             if(!testBoard.isInCheck(pieceColor)){
                 goodMoves.add(i);
-            }else{
-                System.out.println("FLAG: IN CHECK - " + i.toString());
             }
-            System.out.println("Move:\n"+testBoard.toString());
 
             //TODO add piece-conversion to movePiece
         }
@@ -93,7 +90,25 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        //Check that there is a piece there
+        if(currentBoard.getPiece(move.getStartPosition()) != null){
+            //Check whose turn it is
+            if(currentBoard.getPiece(move.getStartPosition()).getTeamColor() != activePlayer){
+                throw new InvalidMoveException();
+            }
+        }
+        //Check if valid move, if so then execute it
+        Collection<ChessMove> valids = validMoves(move.getStartPosition());
+        if(!valids.contains(move)){
+            throw new InvalidMoveException();
+        }else{
+            currentBoard.movePiece(move);
+            System.out.println(currentBoard.toString());
+            //Change turn
+            if(activePlayer == TeamColor.WHITE){
+                activePlayer = TeamColor.BLACK;
+            }else{activePlayer = TeamColor.WHITE;}
+        }
     }
 
     /**

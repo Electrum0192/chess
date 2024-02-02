@@ -187,7 +187,7 @@ public class ChessBoard {
             for(var j : possibleMoves){
                 if(this.getPiece(j.getEndPosition()) != null){
                     if(this.getPiece(j.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING){
-                        System.out.println("King at "+j.getEndPosition().toString());
+                        //System.out.println("King at "+j.getEndPosition().toString());
                         return true;
                     }
                 }
