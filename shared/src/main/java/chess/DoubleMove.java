@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 public class DoubleMove extends ChessMove{
     public DoubleMove(ChessPosition startPosition, ChessPosition endPosition, ChessPosition startTwo, ChessPosition endTwo) {
         super(startPosition,endPosition);

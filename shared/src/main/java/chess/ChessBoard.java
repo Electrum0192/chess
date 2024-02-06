@@ -248,8 +248,9 @@ public class ChessBoard {
             Collection<ChessMove> possibleMoves = this.getPiece(i).pieceMoves(this,i);
             //Check each move to see if it could capture the target piece
             for(var j : possibleMoves){
+                //System.out.println("Testing: "+j.toString());
                 if(this.getPiece(j.getEndPosition()) != null){
-                    if(j.getEndPosition() == piecePlace){
+                    if(j.getEndPosition().equals(piecePlace)){
                         //System.out.println("Threat at "+j.getStartPosition().toString());
                         return true;
                     }

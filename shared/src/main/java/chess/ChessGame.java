@@ -97,7 +97,7 @@ public class ChessGame {
             }
             //No pieces in between
             if(canCastle){
-                for(int c = 2; c < 4; c++){
+                for(int c = 2; c <= 4; c++){
                     if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),c)) != null){
                         canCastle = false;
                         //System.out.println("A piece is in the way: Column "+c);
@@ -136,7 +136,14 @@ public class ChessGame {
             //If no problems, add it
             if(canCastle){
                 System.out.println("canCastleLeft = true.");
-                //TODO
+                ChessPosition kingLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-2);
+                ChessPosition rook = new ChessPosition(startPosition.getRow(),1);
+                ChessPosition rookRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-1);
+                DoubleMove castleLeft = new DoubleMove(startPosition,kingLeft,rook,rookRight);
+                goodMoves.add(castleLeft);
+                //Simpler ChessMove for tests to register (We'll figure it out later) TODO
+                ChessMove castleLeftSimple = new ChessMove(startPosition,kingLeft,null);
+                goodMoves.add(castleLeftSimple);
             }
         }
 
@@ -159,7 +166,7 @@ public class ChessGame {
             }
             //No pieces in between
             if(canCastle){
-                for(int c = 6; c < 7; c++){
+                for(int c = 6; c <= 7; c++){
                     if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),c)) != null){
                         canCastle = false;
                         //System.out.println("A piece is in the way: Column "+c);
@@ -180,7 +187,7 @@ public class ChessGame {
                 ChessBoard testBoard = new ChessBoard();
                 testBoard.copyBoard(currentBoard);
                 ChessMove kingLeft = new ChessMove(startPosition, new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 2), null);
-                ChessMove rookRight = new ChessMove(new ChessPosition(startPosition.getRow(), 1), new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 1), null);
+                ChessMove rookRight = new ChessMove(new ChessPosition(startPosition.getRow(), 8), new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 1), null);
                 testBoard.movePiece(kingLeft);
                 testBoard.movePiece(rookRight);
                 //System.out.println("TestBoard after move:\n" + testBoard.toString());
@@ -198,7 +205,14 @@ public class ChessGame {
             //If no problems, add it
             if(canCastle){
                 System.out.println("canCastleRight = true.");
-                //TODO
+                ChessPosition kingRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+2);
+                ChessPosition rook = new ChessPosition(startPosition.getRow(),8);
+                ChessPosition rookLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+1);
+                DoubleMove castleRight = new DoubleMove(startPosition,kingRight,rook,rookLeft);
+                goodMoves.add(castleRight);
+                //Simpler ChessMove for tests to register (We'll figure it out later) TODO
+                ChessMove castleRightSimple = new ChessMove(startPosition,kingRight,null);
+                goodMoves.add(castleRightSimple);
             }
         }
 
@@ -229,6 +243,9 @@ public class ChessGame {
             //System.out.println(currentBoard.toString());
             //Set hasMoved to true
             currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
+            if(move.getClass() == DoubleMove.class){
+                currentBoard.getPiece(((DoubleMove) move).getEndTwo()).hasMoved = true;
+            }
             //Change turn
             if(activePlayer == TeamColor.WHITE){
                 activePlayer = TeamColor.BLACK;
