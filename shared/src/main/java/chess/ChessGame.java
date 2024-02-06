@@ -80,14 +80,18 @@ public class ChessGame {
         //Check for special moves
         //Castling Left
         if(currentBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING){
-            System.out.println("Board to test:\n"+currentBoard.toString());
+            //System.out.println("Board to test:\n"+currentBoard.toString());
             boolean canCastle = true;
 
             ChessPiece king = currentBoard.getPiece(startPosition);
             ChessPiece leftRook = null;
-            if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),1)).getPieceType() == ChessPiece.PieceType.ROOK){
-                leftRook = currentBoard.getPiece(new ChessPosition(startPosition.getRow(),1));
-            }else{canCastle = false;}
+            if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),1)) != null) {
+                if (currentBoard.getPiece(new ChessPosition(startPosition.getRow(), 1)).getPieceType() == ChessPiece.PieceType.ROOK) {
+                    leftRook = currentBoard.getPiece(new ChessPosition(startPosition.getRow(), 1));
+                } else {
+                    canCastle = false;
+                }
+            }else canCastle = false;
             //Neither the King nor Rook has moved
             if(canCastle){
                 if(leftRook.hasMoved || king.hasMoved){
@@ -135,7 +139,7 @@ public class ChessGame {
             }
             //If no problems, add it
             if(canCastle){
-                System.out.println("canCastleLeft = true.");
+                //System.out.println("canCastleLeft = true.");
                 ChessPosition kingLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-2);
                 //Simpler ChessMove for tests to register, makeMove will adapt to DoubleMove
                 ChessMove castleLeftSimple = new ChessMove(startPosition,kingLeft,null);
@@ -150,9 +154,13 @@ public class ChessGame {
 
             ChessPiece king = currentBoard.getPiece(startPosition);
             ChessPiece rightRook = null;
-            if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),8)).getPieceType() == ChessPiece.PieceType.ROOK){
-                rightRook = currentBoard.getPiece(new ChessPosition(startPosition.getRow(),8));
-            }else{canCastle = false;}
+            if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),8)) != null) {
+                if (currentBoard.getPiece(new ChessPosition(startPosition.getRow(), 8)).getPieceType() == ChessPiece.PieceType.ROOK) {
+                    rightRook = currentBoard.getPiece(new ChessPosition(startPosition.getRow(), 8));
+                } else {
+                    canCastle = false;
+                }
+            }else canCastle = false;
             //Neither the King nor Rook has moved
             if(canCastle){
                 if(rightRook.hasMoved || king.hasMoved){
@@ -200,7 +208,7 @@ public class ChessGame {
             }
             //If no problems, add it
             if(canCastle){
-                System.out.println("canCastleRight = true.");
+                //System.out.println("canCastleRight = true.");
                 ChessPosition kingRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+2);
                 //Simpler ChessMove for tests to register, makeMove will adapt to DoubleMove
                 ChessMove castleRightSimple = new ChessMove(startPosition,kingRight,null);
