@@ -10,14 +10,14 @@ public class DoubleMove extends ChessMove{
     /**
      * @return ChessPosition of second piece's starting location
      */
-    public ChessPosition getStartPosition() {
+    public ChessPosition getStartTwo() {
         return startTwo;
     }
 
     /**
      * @return ChessPosition of second piece's ending location
      */
-    public ChessPosition getEndPosition() {
+    public ChessPosition getEndTwo() {
         return endTwo;
     }
 

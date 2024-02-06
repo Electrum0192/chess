@@ -139,6 +139,33 @@ public class ChessBoard {
     }
 
     /**
+     * Alternate version of movePiece, to work with DoubleMoves such as castling
+     *
+     * @param move The move to make
+     */
+    public void movePiece(DoubleMove move) {
+        int sRow = move.getStartPosition().getRow();
+        int sColumn = move.getStartPosition().getColumn();
+        int eRow = move.getEndPosition().getRow();
+        int eColumn = move.getEndPosition().getColumn();
+
+        int sR2 = move.getStartTwo().getRow();
+        int sC2 = move.getStartTwo().getColumn();
+        int eR2 = move.getEndTwo().getRow();
+        int eC2 = move.getEndTwo().getColumn();
+
+        ChessPiece piece = pieces[sRow-1][sColumn-1];
+        pieces[eRow-1][eColumn-1] = piece;
+        pieces[sRow-1][sColumn-1] = null;
+
+        ChessPiece piece2 = pieces[sR2-1][sC2-1];
+        pieces[eR2][eC2] = piece2;
+        pieces[sR2-1][sC2-1] = null;
+
+        //System.out.println(this.toString());
+    }
+
+    /**
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
