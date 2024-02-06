@@ -159,7 +159,7 @@ public class ChessBoard {
         pieces[sRow-1][sColumn-1] = null;
 
         ChessPiece piece2 = pieces[sR2-1][sC2-1];
-        pieces[eR2][eC2] = piece2;
+        pieces[eR2-1][eC2-1] = piece2;
         pieces[sR2-1][sC2-1] = null;
 
         //System.out.println(this.toString());

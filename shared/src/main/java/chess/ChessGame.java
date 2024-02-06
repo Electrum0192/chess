@@ -79,8 +79,8 @@ public class ChessGame {
         }
         //Check for special moves
         //Castling Left
-        //System.out.println("Board to test:\n"+currentBoard.toString());
         if(currentBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING){
+            System.out.println("Board to test:\n"+currentBoard.toString());
             boolean canCastle = true;
 
             ChessPiece king = currentBoard.getPiece(startPosition);
@@ -137,19 +137,15 @@ public class ChessGame {
             if(canCastle){
                 System.out.println("canCastleLeft = true.");
                 ChessPosition kingLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-2);
-                ChessPosition rook = new ChessPosition(startPosition.getRow(),1);
-                ChessPosition rookRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-1);
-                DoubleMove castleLeft = new DoubleMove(startPosition,kingLeft,rook,rookRight);
-                goodMoves.add(castleLeft);
-                //Simpler ChessMove for tests to register (We'll figure it out later) TODO
+                //Simpler ChessMove for tests to register, makeMove will adapt to DoubleMove
                 ChessMove castleLeftSimple = new ChessMove(startPosition,kingLeft,null);
                 goodMoves.add(castleLeftSimple);
             }
         }
 
         //Castling Right
-        //System.out.println("Board to test:\n"+currentBoard.toString());
         if(currentBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING){
+            //System.out.println("Board to test:\n"+currentBoard.toString());
             boolean canCastle = true;
 
             ChessPiece king = currentBoard.getPiece(startPosition);
@@ -206,11 +202,7 @@ public class ChessGame {
             if(canCastle){
                 System.out.println("canCastleRight = true.");
                 ChessPosition kingRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+2);
-                ChessPosition rook = new ChessPosition(startPosition.getRow(),8);
-                ChessPosition rookLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+1);
-                DoubleMove castleRight = new DoubleMove(startPosition,kingRight,rook,rookLeft);
-                goodMoves.add(castleRight);
-                //Simpler ChessMove for tests to register (We'll figure it out later) TODO
+                //Simpler ChessMove for tests to register, makeMove will adapt to DoubleMove
                 ChessMove castleRightSimple = new ChessMove(startPosition,kingRight,null);
                 goodMoves.add(castleRightSimple);
             }
@@ -239,12 +231,40 @@ public class ChessGame {
         if(!valids.contains(move)){
             throw new InvalidMoveException();
         }else{
-            currentBoard.movePiece(move);
-            //System.out.println(currentBoard.toString());
-            //Set hasMoved to true
-            currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
-            if(move.getClass() == DoubleMove.class){
-                currentBoard.getPiece(((DoubleMove) move).getEndTwo()).hasMoved = true;
+            //Check for castling
+            boolean castling = false;
+            if(currentBoard.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.KING){
+                if(move.getStartPosition().getColumn()-move.getEndPosition().getColumn() == 2){
+                    castling = true;
+                    //If here it is a left castling move
+                    ChessPosition startPosition = move.getStartPosition();
+                    ChessPosition kingLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-2);
+                    ChessPosition rook = new ChessPosition(startPosition.getRow(),1);
+                    ChessPosition rookRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()-1);
+                    DoubleMove castleLeft = new DoubleMove(startPosition,kingLeft,rook,rookRight);
+                    currentBoard.movePiece(castleLeft);
+                    currentBoard.getPiece(castleLeft.getEndPosition()).hasMoved = true;
+                    currentBoard.getPiece(castleLeft.getEndTwo()).hasMoved = true;
+                }else if(move.getStartPosition().getColumn()-move.getEndPosition().getColumn() == -2){
+                    castling = true;
+                    //If here, it is a right castling move
+                    ChessPosition startPosition = move.getStartPosition();
+                    ChessPosition kingRight = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+2);
+                    ChessPosition rook = new ChessPosition(startPosition.getRow(),8);
+                    ChessPosition rookLeft = new ChessPosition(startPosition.getRow(),startPosition.getColumn()+1);
+                    DoubleMove castleRight = new DoubleMove(startPosition,kingRight,rook,rookLeft);
+                    currentBoard.movePiece(castleRight);
+                    currentBoard.getPiece(castleRight.getEndPosition()).hasMoved = true;
+                    currentBoard.getPiece(castleRight.getEndTwo()).hasMoved = true;
+                }
+                //If here, piece is King, but move is not castling
+            }
+            if(!castling) {
+                //Move the piece
+                currentBoard.movePiece(move);
+                //System.out.println(currentBoard.toString());
+                //Set hasMoved to true
+                currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
             }
             //Change turn
             if(activePlayer == TeamColor.WHITE){
