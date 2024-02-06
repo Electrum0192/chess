@@ -17,6 +17,13 @@ public class ChessMove {
         this.promo = promotionPiece;
     }
 
+    //Alternate constructor to use in DoubleMove (for castling)
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition) {
+        this.start = startPosition;
+        this.end = endPosition;
+        this.promo = null;
+    }
+
     @Override
     public String toString() {
         return "ChessMove{" +
@@ -63,7 +70,7 @@ public class ChessMove {
         return promo;
     }
 
-    private ChessPosition start;
-    private ChessPosition end;
-    private ChessPiece.PieceType promo;
+    private final ChessPosition start;
+    private final ChessPosition end;
+    private final ChessPiece.PieceType promo;
 }
