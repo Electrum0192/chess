@@ -76,9 +76,70 @@ public class ChessGame {
             if(!testBoard.isInCheck(pieceColor)){
                 goodMoves.add(i);
             }
-
-            //TODO add piece-conversion to movePiece
         }
+        //Check for special moves
+        //Castling Left
+        System.out.println("Board to test:\n"+currentBoard.toString());
+        if(currentBoard.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING){
+            boolean canCastle = true;
+
+            ChessPiece king = currentBoard.getPiece(startPosition);
+            ChessPiece leftRook = null;
+            if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),1)).getPieceType() == ChessPiece.PieceType.ROOK){
+                leftRook = currentBoard.getPiece(new ChessPosition(startPosition.getRow(),1));
+            }else{canCastle = false;}
+            //Neither the King nor Rook has moved
+            if(canCastle){
+                if(leftRook.hasMoved || king.hasMoved){
+                    canCastle = false;
+                    System.out.println("One of the pieces has moved.");
+                }
+            }
+            //No pieces in between
+            if(canCastle){
+                for(int c = 2; c < 4; c++){
+                    if(currentBoard.getPiece(new ChessPosition(startPosition.getRow(),c)) != null){
+                        canCastle = false;
+                        System.out.println("A piece is in the way: Column "+c);
+                        break;
+                    }
+                }
+            }
+            //King is not in check
+            if(canCastle){
+                if(currentBoard.isInCheck(king.getTeamColor())){
+                    canCastle = false;
+                    System.out.println("King is in Check.");
+                }
+            }
+            //Both pieces "safe" after castling
+            if(canCastle) {
+                //make move
+                ChessBoard testBoard = new ChessBoard();
+                testBoard.copyBoard(currentBoard);
+                ChessMove kingLeft = new ChessMove(startPosition, new ChessPosition(startPosition.getRow(), startPosition.getColumn() - 2), null);
+                ChessMove rookRight = new ChessMove(new ChessPosition(startPosition.getRow(), 1), new ChessPosition(startPosition.getRow(), startPosition.getColumn() - 1), null);
+                testBoard.movePiece(kingLeft);
+                testBoard.movePiece(rookRight);
+                System.out.println("TestBoard after move:\n" + testBoard.toString());
+                //Check for Check
+                if(testBoard.isInCheck(pieceColor)){
+                    canCastle = false;
+                    System.out.println("King is not safe.");
+                }
+                //Check rook is safe
+                if(testBoard.isInDanger(rookRight.getEndPosition())){
+                    canCastle = false;
+                    System.out.println("Rook is not safe.");
+                }
+            }
+            //If no problems, add it
+            if(canCastle){
+                System.out.println("canCastle = true.");
+                //TODO
+            }
+        }
+
 
         return goodMoves;
     }
@@ -104,6 +165,8 @@ public class ChessGame {
         }else{
             currentBoard.movePiece(move);
             //System.out.println(currentBoard.toString());
+            //Set hasMoved to true
+            currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
             //Change turn
             if(activePlayer == TeamColor.WHITE){
                 activePlayer = TeamColor.BLACK;

@@ -14,6 +14,7 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
         this.team = pieceColor;
+        this.hasMoved = false;
     }
 
     @Override
@@ -115,4 +116,5 @@ public class ChessPiece {
 
     private ChessGame.TeamColor team;
     private ChessPiece.PieceType type;
+    public Boolean hasMoved;
 }

@@ -33,7 +33,7 @@ public class ChessBoard {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for(int a = 7; a >= 0; a--){
-            for(int b = 7; b >= 0; b--){
+            for(int b = 0; b <= 7; b++){
                 builder.append('|');
                 if(pieces[a][b] == null){
                     builder.append(' ');
@@ -193,6 +193,37 @@ public class ChessBoard {
                 if(this.getPiece(j.getEndPosition()) != null){
                     if(this.getPiece(j.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING){
                         //System.out.println("King at "+j.getEndPosition().toString());
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines if a given piece is in danger
+     *
+     * @param piecePlace The position of the piece you are testing
+     * @return True if the specified piece is threatened
+     */
+    public boolean isInDanger(ChessPosition piecePlace) {
+        //Get enemy color
+        ChessPiece piece = this.getPiece(piecePlace);
+        ChessGame.TeamColor teamColor = piece.getTeamColor();
+        ChessGame.TeamColor enemy;
+        if(teamColor == ChessGame.TeamColor.WHITE){enemy = ChessGame.TeamColor.BLACK;}else enemy = ChessGame.TeamColor.WHITE;
+
+        //Search board for enemy pieces and get their moves
+        Collection<ChessPosition> places = this.getTeam(enemy);
+        for(var i : places){
+            Collection<ChessMove> possibleMoves = this.getPiece(i).pieceMoves(this,i);
+            //Check each move to see if it could capture the target piece
+            for(var j : possibleMoves){
+                if(this.getPiece(j.getEndPosition()) != null){
+                    if(j.getEndPosition() == piecePlace){
+                        //System.out.println("Threat at "+j.getStartPosition().toString());
                         return true;
                     }
                 }
