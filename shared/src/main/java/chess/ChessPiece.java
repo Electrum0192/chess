@@ -15,6 +15,7 @@ public class ChessPiece {
         this.type = type;
         this.team = pieceColor;
         this.hasMoved = false;
+        this.canPassant = false;
     }
 
     @Override
@@ -54,6 +55,39 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return this.type;
+    }
+
+    /**
+     * Handles conditions for this piece getting captured by En Passant
+     *
+     * @param move the move that is being used to determine eligibility for En Passant capture
+     */
+    public void switchPassant(ChessMove move) {
+        if(this.type != PieceType.PAWN){
+            return;
+        }
+        //Get row number based on Team
+        int dashRow;
+        if(this.team == ChessGame.TeamColor.WHITE){
+            dashRow = 4;
+        }else dashRow = 5;
+        //Check if eligible
+        if(this.hasMoved){
+            canPassant = false;
+            return;
+        }
+        if(move.getEndPosition().getRow() == dashRow){ //&& !hasMoved
+            //The pawn is dashing
+            canPassant = true;
+            System.out.println("FLAG: Pawn is Dashing");
+        }
+    }
+
+    /**
+     * @return can this piece be captured by En Passant
+     */
+    public boolean getPassant() {
+        return this.canPassant;
     }
 
     /**
@@ -116,5 +150,6 @@ public class ChessPiece {
 
     private ChessGame.TeamColor team;
     private ChessPiece.PieceType type;
-    public Boolean hasMoved;
+    public boolean hasMoved;
+    private boolean canPassant;
 }

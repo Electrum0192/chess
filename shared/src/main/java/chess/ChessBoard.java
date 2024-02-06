@@ -125,6 +125,11 @@ public class ChessBoard {
         int eRow = move.getEndPosition().getRow();
         int eColumn = move.getEndPosition().getColumn();
 
+        //Get rid of extra pawn in En Passant
+        if(getPiece(move.getEndPosition()) == null && getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && sColumn != eColumn){
+            pieces[sRow-1][eColumn-1] = null;
+        }
+
         ChessPiece piece = pieces[sRow-1][sColumn-1];
         //System.out.println(this.toString());
         pieces[eRow-1][eColumn-1] = piece;

@@ -216,7 +216,6 @@ public class ChessGame {
             }
         }
 
-
         return goodMoves;
     }
 
@@ -239,6 +238,8 @@ public class ChessGame {
         if(!valids.contains(move)){
             throw new InvalidMoveException();
         }else{
+            //Set EnPassant flags, if applicable
+            currentBoard.getPiece(move.getStartPosition()).switchPassant(move);
             //Check for castling
             boolean castling = false;
             if(currentBoard.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.KING){
@@ -270,9 +271,20 @@ public class ChessGame {
             if(!castling) {
                 //Move the piece
                 currentBoard.movePiece(move);
-                //System.out.println(currentBoard.toString());
+                System.out.println(currentBoard.toString());
                 //Set hasMoved to true
                 currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
+            }
+            //Update canPassant for all pawns on enemy team
+            TeamColor enemy;
+            if(activePlayer == TeamColor.WHITE){
+                enemy = TeamColor.BLACK;
+            }else enemy = TeamColor.WHITE;
+            Collection<ChessPosition> enemies = currentBoard.getTeam(enemy);
+            for(var i : enemies){
+                if(currentBoard.getPiece(i).getPieceType() == ChessPiece.PieceType.PAWN){
+                    currentBoard.getPiece(i).switchPassant(move);
+                }
             }
             //Change turn
             if(activePlayer == TeamColor.WHITE){

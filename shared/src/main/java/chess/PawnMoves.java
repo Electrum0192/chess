@@ -77,7 +77,30 @@ public class PawnMoves extends FindMoves {
                     }
                 }
             }
-
+            //Left En Passant
+            if(myPosition.getColumn() != 1) {
+                ChessPosition upLeft = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                ChessPosition left = new ChessPosition(myPosition.getRow(),myPosition.getColumn()-1);
+                if (board.getPiece(left) != null) {
+                    if (board.getPiece(left).getPassant()) {
+                        System.out.println("FLAG 1");
+                        ChessMove capLeft = new ChessMove(myPosition, upLeft, null);
+                        moves.add(capLeft);
+                    }
+                }
+            }
+            //Right En Passant
+            if(myPosition.getColumn() != 8) {
+                ChessPosition upRight = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+                ChessPosition right = new ChessPosition(myPosition.getRow(),myPosition.getColumn()+1);
+                if (board.getPiece(right) != null) {
+                    if (board.getPiece(right).getPassant()) {
+                        System.out.println("FLAG 2");
+                        ChessMove capRight = new ChessMove(myPosition, upRight, null);
+                        moves.add(capRight);
+                    }
+                }
+            }
         }
 
         return moves;
@@ -151,7 +174,30 @@ public class PawnMoves extends FindMoves {
                     }
                 }
             }
-
+            //Left En Passant
+            if(myPosition.getColumn() != 1) {
+                ChessPosition upLeft = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                ChessPosition left = new ChessPosition(myPosition.getRow(),myPosition.getColumn()-1);
+                if (board.getPiece(left) != null) {
+                    if (board.getPiece(left).getPassant()) {
+                        System.out.println("FLAG 3");
+                        ChessMove capLeft = new ChessMove(myPosition, upLeft, null);
+                        moves.add(capLeft);
+                    }
+                }
+            }
+            //Right En Passant
+            if(myPosition.getColumn() != 8) {
+                ChessPosition upRight = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+                ChessPosition right = new ChessPosition(myPosition.getRow(),myPosition.getColumn()+1);
+                if (board.getPiece(right) != null) {
+                    if (board.getPiece(right).getPassant()) {
+                        System.out.println("FLAG 4");
+                        ChessMove capRight = new ChessMove(myPosition, upRight, null);
+                        moves.add(capRight);
+                    }
+                }
+            }
         }
 
         return moves;
