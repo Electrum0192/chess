@@ -53,10 +53,25 @@ public class UserServiceTests{
     public void login() throws Exception{
         service.register(newUser);
         AuthData auth = service.login(newUser);
-        Assertions.assertTrue(memoryAuthDAO.getAuth(auth.authToken()).equals(auth), "User is successfully logged in");
+        Assertions.assertEquals(memoryAuthDAO.getAuth(auth.authToken()), auth, "User is successfully logged in");
 
         UserData badPassword = new UserData(newUser.username(), "badpassword",newUser.email());
         Exception exception = assertThrows(Exception.class, () -> service.login(badPassword));
+        Assertions.assertTrue(exception.getMessage().contains("Error: unauthorized"));
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Logout")
+    public void logout() throws Exception{
+        service.register(newUser);
+        AuthData auth = service.login(newUser);
+        Assertions.assertEquals(memoryAuthDAO.getAuth(auth.authToken()), auth, "User is successfully logged in");
+
+        service.logout(auth);
+        Assertions.assertNull(memoryAuthDAO.getAuth(auth.authToken()), "User is successfully logged out");
+
+        Exception exception = assertThrows(Exception.class, () -> service.logout(auth));
         Assertions.assertTrue(exception.getMessage().contains("Error: unauthorized"));
     }
 }

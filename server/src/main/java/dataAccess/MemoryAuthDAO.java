@@ -42,5 +42,10 @@ public class MemoryAuthDAO implements AuthDAO{
         return null;
     }
 
+    @Override
+    public void deleteAuth(AuthData authData) {
+        auths.remove(authData);
+    }
+
     public Collection<AuthData> getAuthCollection(){return auths;}
 }
