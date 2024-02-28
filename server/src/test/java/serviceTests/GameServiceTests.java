@@ -16,7 +16,7 @@ public class GameServiceTests {
     @BeforeAll
     public static void init(){
         service = new GameService();
-        memoryGameDAO = new MemoryGameDAO();
+        memoryGameDAO = MemoryGameDAO.getInstance();
         newGame = new GameData(1,"white","black","newgame",new ChessGame());
     }
 

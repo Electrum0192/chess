@@ -1,6 +1,8 @@
 package service;
 
+import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryUserDAO;
+import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 
@@ -9,7 +11,7 @@ public class UserService {
      * Delete all user data from database. Used in testing.
      */
     public void clearUsers(){
-        MemoryUserDAO access = new MemoryUserDAO();
+        MemoryUserDAO access = MemoryUserDAO.getInstance();
         access.clear();
     }
     /**
@@ -17,8 +19,17 @@ public class UserService {
      * @param user the UserData of the new user
      * @return an AuthData object for the new user after login
      */
-    public AuthData register(UserData user) {
-        return null;
+    public AuthData register(UserData user) throws Exception {
+        MemoryUserDAO access = MemoryUserDAO.getInstance();
+        //Check if user already exists
+        if(access.getUser(user.username()) != null){
+            throw new Exception("Error: Already Taken");
+        }
+        //Create User
+        access.createUser(user.username(), user.password(), user.email());
+        //Get new AuthData for user
+        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        return authAccess.createAuth(user.username());
     }
 
     /**
@@ -26,8 +37,15 @@ public class UserService {
      * @param user the Userdata of the user
      * @return an AuthData object for the user after login
      */
-    public AuthData login(UserData user) {
-        return null;
+    public AuthData login(UserData user) throws Exception {
+        MemoryUserDAO access = MemoryUserDAO.getInstance();
+        //Check if password is correct
+        if(!access.getUser(user.username()).password().equals(user.password())){
+            throw new Exception("Error: unauthorized");
+        }
+        //Get new AuthData for user
+        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        return authAccess.createAuth(user.username());
     }
 
     /**
