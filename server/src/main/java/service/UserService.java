@@ -1,5 +1,6 @@
 package service;
 
+import dataAccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 
@@ -7,7 +8,10 @@ public class UserService {
     /**
      * Delete all user data from database. Used in testing.
      */
-    public void clearUsers(){}
+    public void clearUsers(){
+        MemoryUserDAO access = new MemoryUserDAO();
+        access.clear();
+    }
     /**
      * Register a new user and log them in
      * @param user the UserData of the new user

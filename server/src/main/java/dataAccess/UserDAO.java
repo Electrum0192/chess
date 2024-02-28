@@ -2,13 +2,14 @@ package dataAccess;
 
 import model.UserData;
 
+import java.util.Collection;
+
 public interface UserDAO {
+
     /**
      * Delete all user data from database. Used in testing.
      */
-    public default void clear(){
-
-    }
+    public default void clear(){}
 
     /**
      * Create new user model with the given parameters

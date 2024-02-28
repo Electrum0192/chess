@@ -8,9 +8,7 @@ public interface GameDAO {
     /**
      * Delete all game data from database. Used in testing.
      */
-    public default void clear(){
-
-    }
+    public default void clear(){}
 
     /**
      * Create a new game

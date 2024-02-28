@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataAccess.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
@@ -9,7 +10,14 @@ public class GameService {
     /**
      * Delete all game data from database. Used in testing.
      */
-    public void clearGames(){}
+    public void clearGames(){
+        GameDAO access = new GameDAO() {
+            @Override
+            public void clear() {
+                GameDAO.super.clear();
+            }
+        };
+    }
 
     /**
      * Retrieve info for all games
