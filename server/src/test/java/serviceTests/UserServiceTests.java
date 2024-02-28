@@ -25,6 +25,11 @@ public class UserServiceTests{
         newUser = new UserData("newuser","newpassword","newemail");
     }
 
+    @BeforeEach
+    public void setup(){
+        service.clearUsers();
+    }
+
     @Test
     @Order(1)
     @DisplayName("Clear")

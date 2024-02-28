@@ -12,9 +12,10 @@ public interface GameDAO {
 
     /**
      * Create a new game
+     * @param gameName the name of the new game
      * @return gameID
      */
-    public default int createGame(){
+    public default int createGame(String gameName){
         return 0;
     }
 
