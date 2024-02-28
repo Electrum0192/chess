@@ -5,6 +5,7 @@ import dataAccess.GameDAO;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.UserDAO;
+import model.AuthData;
 import model.GameData;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class GameService {
     public int createGame(String authToken, String gameName) throws Exception {
         //Have valid authToken
         MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        if(authAccess.getAuth(authToken) == null || !authToken.equals(authAccess.getAuth(authToken).authToken())){
+        if(authAccess.getAuth(authToken) == null){
             throw new Exception("Error: unauthorized");
         }
         //Does game with that name already exist?
@@ -53,5 +54,40 @@ public class GameService {
      * @param gameID ID of the game you'd like to join
      * @param requestColor Team color you'd like to join as
      */
-    public void joinGame(int gameID, ChessGame.TeamColor requestColor){}
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor requestColor) throws Exception {
+        //Is User authorized?
+        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        if(authAccess.getAuth(authToken) == null) {
+            throw new Exception("Error: unauthorized");
+        }
+        //Does game with that ID exist?
+        MemoryGameDAO access = MemoryGameDAO.getInstance();
+        if(access.getGame(gameID) == null){
+            throw new Exception("Error: bad request");
+        }
+        //Is requested color open
+        if(requestColor == ChessGame.TeamColor.WHITE){
+            if(access.getGame(gameID).whiteUsername() != null){
+                throw new Exception("Error: already taken");
+            }
+        }else if(requestColor == ChessGame.TeamColor.BLACK){
+            if(access.getGame(gameID).blackUsername() != null){
+                throw new Exception("Error: already taken");
+            }
+        }
+        //Join Game
+        AuthData auth = authAccess.getAuth(authToken);
+        String username = auth.username();
+        GameData game = access.getGame(gameID);
+        GameData newGame;
+        if(requestColor == ChessGame.TeamColor.WHITE){
+            newGame = new GameData(gameID,username,game.blackUsername(),game.gameName(),game.game());
+        }else if(requestColor == ChessGame.TeamColor.BLACK){
+            newGame = new GameData(gameID,game.whiteUsername(),username,game.gameName(),game.game());
+        }else{
+            //Observer
+            newGame = game;
+        }
+        access.setGame(newGame);
+    }
 }

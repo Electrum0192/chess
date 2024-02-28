@@ -19,7 +19,6 @@ public class GameServiceTests {
     private static GameService service;
     private static UserService userService;
     private static MemoryGameDAO memoryGameDAO;
-    private static GameData newGame;
     private static UserData newUser;
     private static AuthData newAuth;
 
@@ -27,7 +26,6 @@ public class GameServiceTests {
     public static void init() throws Exception {
         service = new GameService();
         memoryGameDAO = MemoryGameDAO.getInstance();
-        newGame = new GameData(1,"white","black","newgame",new ChessGame());
         newUser = new UserData("newusername","newpassword","newemail");
         userService = new UserService();
         newAuth = userService.register(newUser);
@@ -71,5 +69,27 @@ public class GameServiceTests {
 
         Exception exception2 = assertThrows(Exception.class, () -> service.createGame(newAuth.authToken(),"newGame"));
         Assertions.assertTrue(exception2.getMessage().contains("Error: bad request"));
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Join Game")
+    public void joinGame() throws Exception{
+        service.createGame(newAuth.authToken(), "newGame");
+
+        service.joinGame(newAuth.authToken(),0, ChessGame.TeamColor.WHITE);
+        Assertions.assertEquals(memoryGameDAO.getGame(0).whiteUsername(), newUser.username(), "User successfully joined as White");
+
+        service.joinGame(newAuth.authToken(),0, ChessGame.TeamColor.BLACK);
+        Assertions.assertEquals(memoryGameDAO.getGame(0).blackUsername(), newUser.username(), "User successfully joined as Black");
+
+        Exception exception = assertThrows(Exception.class, () -> service.joinGame(newAuth.authToken(),0, ChessGame.TeamColor.WHITE));
+        Assertions.assertTrue(exception.getMessage().contains("Error: already taken"), "Correctly threw already taken exception");
+
+        Exception exception2 = assertThrows(Exception.class, () -> service.joinGame(newAuth.authToken(),10, ChessGame.TeamColor.WHITE));
+        Assertions.assertTrue(exception2.getMessage().contains("Error: bad request"), "Correctly threw invalid game exception");
+
+        Exception exception3 = assertThrows(Exception.class, () -> service.joinGame("Nope",0, ChessGame.TeamColor.WHITE));
+        Assertions.assertTrue(exception3.getMessage().contains("Error: unauthorized"), "Correctly threw unauthorized exception");
     }
 }
