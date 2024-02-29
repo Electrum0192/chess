@@ -48,7 +48,7 @@ public class UserServiceTests{
         Assertions.assertTrue(memoryAuthDAO.getAuth(auth.authToken()).equals(auth), "AuthData matches memory");
 
         Exception exception = assertThrows(Exception.class, () -> {service.register(newUser);});
-        Assertions.assertTrue(exception.getMessage().contains("Error: Already Taken"));
+        Assertions.assertTrue(exception.getMessage().contains("Error: already taken"));
 
     }
 

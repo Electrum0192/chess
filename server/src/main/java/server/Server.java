@@ -26,6 +26,6 @@ public class Server {
         return UserHandler.clearApp();
     }
     private Object register(Request req, Response res){
-        return UserHandler.register(req);
+        return UserHandler.register(req,res);
     }
 }

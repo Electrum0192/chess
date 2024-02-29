@@ -23,7 +23,7 @@ public class UserService {
         MemoryUserDAO access = MemoryUserDAO.getInstance();
         //Check if user already exists
         if(access.getUser(user.username()) != null){
-            throw new Exception("Error: Already Taken");
+            throw new Exception("Error: already taken");
         }
         //Create User
         access.createUser(user.username(), user.password(), user.email());
