@@ -2,7 +2,7 @@ package dataAccess;
 
 import chess.ChessGame;
 import model.GameData;
-import model.UserData;
+import model.Game;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,7 +24,14 @@ public class MemoryGameDAO implements GameDAO{
         games.clear();
     }
     @Override
-    public Collection<GameData> listGames(){return games;}
+    public Collection<Game> listGames(){
+        Collection<Game> list = new HashSet<Game>();
+        for(var i: games){
+            Game game = new Game(i.gameID(),i.whiteUsername(),i.blackUsername(),i.gameName());
+            list.add(game);
+        }
+        return list;
+    }
 
     @Override
     public int createGame(String gameName) {

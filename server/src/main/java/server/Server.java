@@ -14,6 +14,7 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -35,5 +36,8 @@ public class Server {
     }
     private Object logout(Request req, Response res){
         return UserHandler.logout(req,res);
+    }
+    private Object listGames(Request req, Response res){
+        return GameHandler.listGames(req,res);
     }
 }

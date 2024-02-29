@@ -1,12 +1,11 @@
 package service;
 
 import chess.ChessGame;
-import dataAccess.GameDAO;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
-import dataAccess.UserDAO;
 import model.AuthData;
 import model.GameData;
+import model.Game;
 
 import java.util.Collection;
 
@@ -23,7 +22,13 @@ public class GameService {
      * Retrieve info for all games
      * @return Collection of GameData records
      */
-    public Collection<GameData> listGames(){
+    public Collection<Game> listGames(String authToken) throws Exception {
+        //Have valid authToken
+        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        if(authAccess.getAuth(authToken) == null){
+            throw new Exception("Error: unauthorized");
+        }
+        //Get Games
         MemoryGameDAO access = MemoryGameDAO.getInstance();
         return access.listGames();
     }
@@ -39,7 +44,7 @@ public class GameService {
         }
         //Does game with that name already exist?
         MemoryGameDAO access = MemoryGameDAO.getInstance();
-        Collection<GameData> games = access.listGames();
+        Collection<Game> games = access.listGames();
         for(var i : games){
             if(i.gameName().equals(gameName)){
                 throw new Exception("Error: bad request");

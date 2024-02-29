@@ -1,6 +1,7 @@
 package dataAccess;
 
 import model.GameData;
+import model.Game;
 
 import java.util.Collection;
 
@@ -32,7 +33,7 @@ public interface GameDAO {
      * Retrieve info for all games
      * @return Collection of GameData records
      */
-    public default Collection<GameData> listGames(){
+    public default Collection<Game> listGames(){
         return null;
     }
 
