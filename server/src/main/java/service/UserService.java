@@ -59,10 +59,10 @@ public class UserService {
      * Logout the user
      * @param auth the AuthData of the User
      */
-    public void logout(AuthData auth) throws Exception {
+    public void logout(String auth) throws Exception {
         MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
         //Is auth in database? AKA is user authorized
-        if(authAccess.getAuth(auth.authToken()) == null){
+        if(authAccess.getAuth(auth) == null){
             throw new Exception("Error: unauthorized");
         }
         //Logout the user

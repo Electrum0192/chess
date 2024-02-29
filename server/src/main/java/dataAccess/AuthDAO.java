@@ -30,9 +30,9 @@ public interface AuthDAO {
 
     /**
      * Remove an AuthData model from the database
-     * @param authData
+     * @param authToken the authToken associated with that AuthData object
      */
-    public default void deleteAuth(AuthData authData){
+    public default void deleteAuth(String authToken){
 
     }
 

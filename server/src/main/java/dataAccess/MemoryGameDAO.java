@@ -9,11 +9,13 @@ import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO{
     private static Collection<GameData> games;
+    private static int nextID;
 
     private static final MemoryGameDAO instance = new MemoryGameDAO();
 
     private MemoryGameDAO() {
         games = new HashSet<GameData>();
+        nextID = 0;
     }
     public static MemoryGameDAO getInstance(){return instance;}
 
@@ -26,8 +28,9 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public int createGame(String gameName) {
-        GameData newGame = new GameData(games.size(),null,null,gameName,new ChessGame());
+        GameData newGame = new GameData(nextID,null,null,gameName,new ChessGame());
         games.add(newGame);
+        nextID++;
         return newGame.gameID();
     }
 

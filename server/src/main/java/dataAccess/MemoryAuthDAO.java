@@ -25,8 +25,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public AuthData createAuth(String username) {
-        Random rand = new Random();
-        String authToken = rand.nextInt(1000)+"";
+        String authToken = generateAuthToken();
         AuthData newAuth = new AuthData(authToken,username);
         auths.add(newAuth);
         return newAuth;
@@ -43,9 +42,30 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
-        auths.remove(authData);
+    public void deleteAuth(String authtoken) {
+        for(var i : auths){
+            if(i.authToken().equals(authtoken)){
+                auths.remove(i);
+                return;
+            }
+        }
     }
 
     public Collection<AuthData> getAuthCollection(){return auths;}
+
+    private String generateAuthToken(){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 5;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        String generatedString = buffer.toString();
+
+        return generatedString;
+    }
 }

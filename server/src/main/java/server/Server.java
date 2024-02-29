@@ -13,6 +13,7 @@ public class Server {
         Spark.delete("/db", this::clearApp);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -31,5 +32,8 @@ public class Server {
     }
     private Object login(Request req, Response res){
         return UserHandler.login(req,res);
+    }
+    private Object logout(Request req, Response res){
+        return UserHandler.logout(req,res);
     }
 }

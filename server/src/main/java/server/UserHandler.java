@@ -51,7 +51,25 @@ public class UserHandler {
         try{
             return new Gson().toJson(userService.login(user));
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
+            if(e.getMessage().contains("Error: unauthorized")){
+                res.status(401);
+                res.body(message);
+            }else{
+                res.status(500);
+                res.body(new Gson().toJson(new ErrorMessage("Error: description")));
+            }
+            return message;
+        }
+    }
+
+    public static String logout(Request req, Response res){
+        UserService userService = new UserService();
+        var auth = new Gson().fromJson(req.headers("authorization"), String.class);
+        try{
+            userService.logout(auth);
+            return new Gson().toJson(null);
+        }catch (Exception e){
             var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
             if(e.getMessage().contains("Error: unauthorized")){
                 res.status(401);

@@ -73,10 +73,10 @@ public class UserServiceTests{
         AuthData auth = service.login(newUser);
         Assertions.assertEquals(memoryAuthDAO.getAuth(auth.authToken()), auth, "User is successfully logged in");
 
-        service.logout(auth);
+        service.logout(auth.authToken());
         Assertions.assertNull(memoryAuthDAO.getAuth(auth.authToken()), "User is successfully logged out");
 
-        Exception exception = assertThrows(Exception.class, () -> service.logout(auth));
+        Exception exception = assertThrows(Exception.class, () -> service.logout(auth.authToken()));
         Assertions.assertTrue(exception.getMessage().contains("Error: unauthorized"));
     }
 }
