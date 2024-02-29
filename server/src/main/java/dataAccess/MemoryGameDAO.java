@@ -15,7 +15,7 @@ public class MemoryGameDAO implements GameDAO{
 
     private MemoryGameDAO() {
         games = new HashSet<GameData>();
-        nextID = 0;
+        nextID = 1;
     }
     public static MemoryGameDAO getInstance(){return instance;}
 

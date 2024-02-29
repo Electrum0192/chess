@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import model.GameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -18,6 +19,29 @@ public class GameHandler {
             var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
             if(e.getMessage().contains("Error: unauthorized")){
                 res.status(401);
+                res.body(message);
+            }else{
+                res.status(500);
+                res.body(new Gson().toJson(new ErrorMessage("Error: description")));
+            }
+            return message;
+        }
+    }
+
+    public static Object createGame(Request req, Response res) {
+        GameService gameService = new GameService();
+        var auth = new Gson().fromJson(req.headers("authorization"), String.class);
+        var gameName = new Gson().fromJson(req.body(), GameData.class);
+        try{
+            GameID ID = new GameID(gameService.createGame(auth,gameName.gameName()));
+            return new Gson().toJson(ID);
+        }catch (Exception e){
+            var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
+            if(e.getMessage().contains("Error: unauthorized")){
+                res.status(401);
+                res.body(message);
+            }else if(e.getMessage().contains("Error: bad request")){
+                res.status(400);
                 res.body(message);
             }else{
                 res.status(500);
