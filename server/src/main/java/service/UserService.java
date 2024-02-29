@@ -25,6 +25,10 @@ public class UserService {
         if(access.getUser(user.username()) != null){
             throw new Exception("Error: already taken");
         }
+        //Check if UserData contains a password
+        if(user.password() == null){
+            throw new Exception("Error: bad request");
+        }
         //Create User
         access.createUser(user.username(), user.password(), user.email());
         //Get new AuthData for user
@@ -39,7 +43,10 @@ public class UserService {
      */
     public AuthData login(UserData user) throws Exception {
         MemoryUserDAO access = MemoryUserDAO.getInstance();
-        //Check if password is correct
+        //Check if user exists and password is correct
+        if(access.getUser(user.username()) == null){
+            throw new Exception("Error: unauthorized");
+        }
         if(!access.getUser(user.username()).password().equals(user.password())){
             throw new Exception("Error: unauthorized");
         }

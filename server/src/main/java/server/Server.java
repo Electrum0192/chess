@@ -12,6 +12,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearApp);
         Spark.post("/user", this::register);
+        Spark.post("/session", this::login);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -23,9 +24,12 @@ public class Server {
     }
 
     private Object clearApp(Request req, Response res){
-        return UserHandler.clearApp();
+        return UserHandler.clearApp(res);
     }
     private Object register(Request req, Response res){
         return UserHandler.register(req,res);
+    }
+    private Object login(Request req, Response res){
+        return UserHandler.login(req,res);
     }
 }
