@@ -16,6 +16,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
+        Spark.put("/game",this::joinGame);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -44,4 +45,5 @@ public class Server {
     private Object createGame(Request req, Response res){
         return GameHandler.createGame(req,res);
     }
+    private Object joinGame(Request req, Response res){return GameHandler.joinGame(req,res);}
 }

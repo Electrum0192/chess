@@ -13,6 +13,8 @@ public class UserService {
     public void clearUsers(){
         MemoryUserDAO access = MemoryUserDAO.getInstance();
         access.clear();
+        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        authAccess.clear();
     }
     /**
      * Register a new user and log them in

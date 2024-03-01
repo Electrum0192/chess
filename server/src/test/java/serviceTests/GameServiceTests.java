@@ -75,21 +75,21 @@ public class GameServiceTests {
     @Order(4)
     @DisplayName("Join Game")
     public void joinGame() throws Exception{
-        service.createGame(newAuth.authToken(), "newGame");
+        int ID = service.createGame(newAuth.authToken(), "newGame");
 
-        service.joinGame(newAuth.authToken(),1, ChessGame.TeamColor.WHITE);
-        Assertions.assertEquals(memoryGameDAO.getGame(1).whiteUsername(), newUser.username(), "User successfully joined as White");
+        service.joinGame(newAuth.authToken(),ID, ChessGame.TeamColor.WHITE);
+        Assertions.assertEquals(memoryGameDAO.getGame(ID).whiteUsername(), newUser.username(), "User successfully joined as White");
 
-        service.joinGame(newAuth.authToken(),1, ChessGame.TeamColor.BLACK);
-        Assertions.assertEquals(memoryGameDAO.getGame(1).blackUsername(), newUser.username(), "User successfully joined as Black");
+        service.joinGame(newAuth.authToken(),ID, ChessGame.TeamColor.BLACK);
+        Assertions.assertEquals(memoryGameDAO.getGame(ID).blackUsername(), newUser.username(), "User successfully joined as Black");
 
-        Exception exception = assertThrows(Exception.class, () -> service.joinGame(newAuth.authToken(),1, ChessGame.TeamColor.WHITE));
+        Exception exception = assertThrows(Exception.class, () -> service.joinGame(newAuth.authToken(),ID, ChessGame.TeamColor.WHITE));
         Assertions.assertTrue(exception.getMessage().contains("Error: already taken"), "Correctly threw already taken exception");
 
         Exception exception2 = assertThrows(Exception.class, () -> service.joinGame(newAuth.authToken(),10, ChessGame.TeamColor.WHITE));
         Assertions.assertTrue(exception2.getMessage().contains("Error: bad request"), "Correctly threw invalid game exception");
 
-        Exception exception3 = assertThrows(Exception.class, () -> service.joinGame("Nope",1, ChessGame.TeamColor.WHITE));
+        Exception exception3 = assertThrows(Exception.class, () -> service.joinGame("Nope",ID, ChessGame.TeamColor.WHITE));
         Assertions.assertTrue(exception3.getMessage().contains("Error: unauthorized"), "Correctly threw unauthorized exception");
     }
 }
