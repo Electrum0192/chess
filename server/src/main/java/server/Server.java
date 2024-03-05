@@ -1,5 +1,7 @@
 package server;
 
+import dataAccess.DataAccessException;
+import dataAccess.DatabaseManager;
 import spark.*;
 
 public class Server {
@@ -8,6 +10,13 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        try{
+            DatabaseManager.createDatabase();
+        }catch (DataAccessException e){
+            System.out.println("ERROR: DATABASE CREATION FAILED");
+        }
+
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearApp);
