@@ -11,11 +11,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        try{
-            DatabaseManager.createDatabase();
-        }catch (DataAccessException e){
-            System.out.println("ERROR: DATABASE CREATION FAILED");
-        }
+        DatabaseManager.initialize();
 
 
         // Register your endpoints and handle exceptions here.

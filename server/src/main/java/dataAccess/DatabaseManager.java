@@ -34,7 +34,7 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    public static void createDatabase() throws DataAccessException {
+    static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
             var conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -43,6 +43,55 @@ public class DatabaseManager {
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    public static void initialize(){
+        //Create Database if it doesn't exist
+        try{
+            createDatabase();
+        }catch (DataAccessException e){
+            System.out.println("ERROR: DATABASE CREATION FAILED");
+        }
+        //Create User Table if it doesn't exist
+        var createUserTable = """
+            CREATE TABLE  IF NOT EXISTS users (
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+            )""";
+        try(var createTableStatement = getConnection().prepareStatement(createUserTable)){
+            createTableStatement.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
+        //Create Game Table if it doesn't exist
+        var createGameTable = """
+            CREATE TABLE  IF NOT EXISTS games (
+                gameID INT NOT NULL,
+                whiteUsername VARCHAR(255),
+                blackUsername VARCHAR(255),
+                gameName VARCHAR(255),
+                chessGame VARCHAR(255) NOT NULL,
+                PRIMARY KEY (gameID)
+            )""";
+        try(var createTableStatement = getConnection().prepareStatement(createGameTable)){
+            createTableStatement.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
+        //Create Auth Table if it doesn't exist
+        var createAuthTable = """
+            CREATE TABLE  IF NOT EXISTS auths (
+                username VARCHAR(255) NOT NULL,
+                authtoken VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+            )""";
+        try(var createTableStatement = getConnection().prepareStatement(createAuthTable)){
+            createTableStatement.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            System.out.println(e.getMessage());
         }
     }
 
