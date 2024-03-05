@@ -1,5 +1,7 @@
 package dataAccess;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -46,6 +48,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Creates database and tables after checking if they already exist
+     */
     public static void initialize(){
         //Create Database if it doesn't exist
         try{
@@ -115,5 +120,15 @@ public class DatabaseManager {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
+    }
+
+    /**
+     * Encryption function for secure passwords
+     * @param input the unencrypted password
+     * @return the encrypted version of that password
+     */
+    static String encrypt(String input){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(input);
     }
 }
