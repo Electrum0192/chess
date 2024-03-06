@@ -12,7 +12,7 @@ public class MemoryUserDAO implements UserDAO{
     private static final MemoryUserDAO instance = new MemoryUserDAO();
 
     private MemoryUserDAO() {
-        users = new HashSet<UserData>();
+        users = new HashSet<>();
     }
 
     public static MemoryUserDAO getInstance(){return instance;}
