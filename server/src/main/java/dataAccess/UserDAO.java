@@ -22,7 +22,7 @@ public interface UserDAO {
     }
 
     /**
-     * Get user data model for the given username
+     * Get user data model for the given username. Returns NULL if there is no user with that username.
      * @param username
      * @return the UserData model for that user profile
      */
