@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO{
     private static final MemoryGameDAO instance = new MemoryGameDAO();
 
     private MemoryGameDAO() {
-        games = new HashSet<GameData>();
+        games = new HashSet<>();
         nextID = 1;
     }
     public static MemoryGameDAO getInstance(){return instance;}
@@ -25,7 +25,7 @@ public class MemoryGameDAO implements GameDAO{
     }
     @Override
     public Collection<Game> listGames(){
-        Collection<Game> list = new HashSet<Game>();
+        Collection<Game> list = new HashSet<>();
         for(var i: games){
             Game game = new Game(i.gameID(),i.whiteUsername(),i.blackUsername(),i.gameName());
             list.add(game);
