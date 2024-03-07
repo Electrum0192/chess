@@ -90,8 +90,8 @@ public class DatabaseManager {
         var createAuthTable = """
             CREATE TABLE  IF NOT EXISTS auths (
                 username VARCHAR(255) NOT NULL,
-                authtoken VARCHAR(255) NOT NULL,
-                PRIMARY KEY (username)
+                authToken VARCHAR(255) NOT NULL,
+                PRIMARY KEY (authToken)
             )""";
         try(var createTableStatement = getConnection().prepareStatement(createAuthTable)){
             createTableStatement.executeUpdate();
