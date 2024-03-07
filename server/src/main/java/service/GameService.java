@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
+import dataAccess.SQLGameDAO;
 import model.AuthData;
 import model.GameData;
 import model.Game;
@@ -14,8 +15,8 @@ public class GameService {
      * Delete all game data from database. Used in testing.
      */
     public void clearGames(){
-        MemoryGameDAO access = MemoryGameDAO.getInstance();
-        access.clear();
+        MemoryGameDAO.getInstance().clear();
+        new SQLGameDAO().clear();
     }
 
     /**
@@ -51,7 +52,8 @@ public class GameService {
             }
         }
         //Create new game
-        return access.createGame(gameName);
+        access.createGame(gameName);
+        return new SQLGameDAO().createGame(gameName);
     }
 
     /**

@@ -33,6 +33,7 @@ public class UserService {
         access.createUser(user.username(), user.password(), user.email());
         new SQLUserDAO().createUser(user.username(), user.password(), user.email());
         //Get new AuthData for user
+        //MUST CREATE IN MEMORY FIRST TO ENSURE AUTHTOKEN IS THE SAME
         MemoryAuthDAO.getInstance().createAuth(user.username());
         return new SQLAuthDAO().createAuth(user.username());
     }
