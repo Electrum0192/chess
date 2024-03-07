@@ -1,8 +1,6 @@
 package service;
 
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryUserDAO;
-import dataAccess.UserDAO;
+import dataAccess.*;
 import model.AuthData;
 import model.UserData;
 
@@ -11,10 +9,10 @@ public class UserService {
      * Delete all user data from database. Used in testing.
      */
     public void clearUsers(){
-        MemoryUserDAO access = MemoryUserDAO.getInstance();
-        access.clear();
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        authAccess.clear();
+        MemoryUserDAO.getInstance().clear();
+        new SQLUserDAO().clear();
+        MemoryAuthDAO.getInstance().clear();
+        new SQLAuthDAO().clear();
     }
     /**
      * Register a new user and log them in
@@ -33,9 +31,10 @@ public class UserService {
         }
         //Create User
         access.createUser(user.username(), user.password(), user.email());
+        new SQLUserDAO().createUser(user.username(), user.password(), user.email());
         //Get new AuthData for user
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        return authAccess.createAuth(user.username());
+        MemoryAuthDAO.getInstance().createAuth(user.username());
+        return new SQLAuthDAO().createAuth(user.username());
     }
 
     /**
