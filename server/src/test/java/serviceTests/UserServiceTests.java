@@ -6,6 +6,7 @@ import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,8 +45,8 @@ public class UserServiceTests{
     @DisplayName("Register")
     public void register() throws Exception{
         AuthData auth = service.register(newUser);
-        Assertions.assertTrue(memoryUserDAO.getUserCollection().contains(newUser),"User is successfully created");
-        Assertions.assertTrue(memoryAuthDAO.getAuth(auth.authToken()).equals(auth), "AuthData matches memory");
+        Assertions.assertNotNull(memoryUserDAO.getUser("newuser"), "User is successfully created");
+        Assertions.assertEquals(memoryAuthDAO.getAuth(auth.authToken()), auth, "AuthData matches memory");
 
         Exception exception = assertThrows(Exception.class, () -> {service.register(newUser);});
         Assertions.assertTrue(exception.getMessage().contains("Error: already taken"));

@@ -82,6 +82,7 @@ public class GameService {
                 throw new Exception("Error: already taken");
             }
         }
+
         //Join Game
         AuthData auth = authAccess.getAuth(authToken);
         String username = auth.username();

@@ -77,12 +77,11 @@ public class DatabaseManager {
         //Create Game Table if it doesn't exist
         var createGameTable = """
             CREATE TABLE  IF NOT EXISTS games (
-                gameID INT NOT NULL AUTO_INCREMENT,
+                gameID INT NOT NULL PRIMARY KEY,
                 whiteUsername VARCHAR(255),
                 blackUsername VARCHAR(255),
                 gameName VARCHAR(255),
-                chessGame VARCHAR(255) NOT NULL,
-                PRIMARY KEY (gameID)
+                chessGame BLOB NOT NULL
             )""";
         try(var createTableStatement = getConnection().prepareStatement(createGameTable)){
             createTableStatement.executeUpdate();
@@ -173,6 +172,15 @@ public class DatabaseManager {
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
+        }
+    }
+
+    public static void deleteDatabase(){
+        try(var conn = getConnection()){
+            var preparedStatement = conn.prepareStatement("DROP DATABASE chess");
+            preparedStatement.executeUpdate();
+        }catch (Exception e){
+            System.out.println("deleteDatabase: "+e.getMessage());
         }
     }
 }

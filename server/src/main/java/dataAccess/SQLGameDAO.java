@@ -5,6 +5,7 @@ import model.Game;
 import model.GameData;
 import chess.ChessGame;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,22 +48,27 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public int createGame(String gameName) {
         try(var conn = DatabaseManager.getConnection()){
-            var preparedStatement = conn.prepareStatement("INSERT INTO games (whiteUsername, blackUsername, gameName) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, null);
+            //Get table size from Database
+            var preparedStatement = conn.prepareStatement("SELECT count(*) FROM games");
+            var result = preparedStatement.executeQuery();
+            int size = 0;
+            while(result.next()) {
+                size = result.getInt(1);
+            }
+
+            preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES(?, ?, ?, ?, ?)");
+            preparedStatement.setInt(1, size+1);
             preparedStatement.setString(2, null);
-            preparedStatement.setString(3, gameName);
+            preparedStatement.setString(3, null);
+            preparedStatement.setString(4, gameName);
+            preparedStatement.setString(5, new Gson().toJson(new ChessGame()));
 
             preparedStatement.executeUpdate();
 
-            var rs = preparedStatement.getGeneratedKeys();
-            var ID = 0;
-            if(rs.next()){
-                ID = rs.getInt(1);
-            }
-            return ID;
+            return size+1;
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("createGame: "+e.getMessage());
         }
         return -1;
     }
@@ -101,19 +107,18 @@ public class SQLGameDAO implements GameDAO{
     }
 
     public void updatePlayers(int ID, ChessGame.TeamColor team, String username){
-        String teamString;
-        if(team.equals(ChessGame.TeamColor.WHITE)){
-            teamString = "whiteUsername";
-        }else{teamString = "blackUsername";}
-
         try(var conn = DatabaseManager.getConnection()){
-            var preparedStatement = conn.prepareStatement("UPDATE games SET ?=? WHERE gameID=?");
-            preparedStatement.setString(1,teamString);
-            preparedStatement.setString(2,username);
-            preparedStatement.setInt(3,ID);
+            var preparedStatement = conn.prepareStatement("UPDATE games");
+            if(team.equals(ChessGame.TeamColor.WHITE)){
+                preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername=? WHERE gameID=?");
+            }else{
+                preparedStatement = conn.prepareStatement("UPDATE games SET blackUsername=? WHERE gameID=?");
+            }
+            preparedStatement.setString(1,username);
+            preparedStatement.setInt(2,ID);
             preparedStatement.executeUpdate();
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("updatePlayers: "+e.getMessage());
         }
     }
 }

@@ -1,6 +1,7 @@
 package serviceTests;
 
 import chess.ChessGame;
+import dataAccess.DatabaseManager;
 import dataAccess.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
@@ -24,11 +25,16 @@ public class GameServiceTests {
 
     @BeforeAll
     public static void init() throws Exception {
+        DatabaseManager.deleteDatabase();
+        DatabaseManager.initialize();
         service = new GameService();
         memoryGameDAO = MemoryGameDAO.getInstance();
         newUser = new UserData("newusername","newpassword","newemail");
         userService = new UserService();
-        newAuth = userService.register(newUser);
+        service.clearGames();
+        userService.clearUsers();
+        userService.register(newUser);
+        newAuth = userService.login(newUser);
     }
 
     @BeforeEach
