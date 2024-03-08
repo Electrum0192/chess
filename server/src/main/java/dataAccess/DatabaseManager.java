@@ -1,5 +1,8 @@
 package dataAccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
+import model.GameData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.*;
@@ -130,5 +133,46 @@ public class DatabaseManager {
     static String encrypt(String input){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.encode(input);
+    }
+
+    /**
+     * Updates the memory database with persistent data from the SQL database. Used on server startup.
+     */
+    static void updateMemory(){
+        try(var conn = getConnection()){
+            //Update Users
+            var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM users");
+            try(var rs = preparedStatement.executeQuery()){
+                MemoryUserDAO access = MemoryUserDAO.getInstance();
+                while(rs.next()){
+                    if(access.getUser(rs.getString("username")) == null){
+                        access.createUser(rs.getString("username"), rs.getString("password"), rs.getString("email")); //TODO Adapt memory to use encrypted passwords
+                    }
+                }
+            }
+            //Update Games
+            preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM games");
+            try(var rs = preparedStatement.executeQuery()){
+                MemoryGameDAO access = MemoryGameDAO.getInstance();
+                while(rs.next()){
+                    if(access.getGame(rs.getInt("gameID")) == null){
+                        ChessGame game = new Gson().fromJson(rs.getString("chessGame"), ChessGame.class);
+                        access.addGame(new GameData(rs.getInt("gameID"),rs.getString("whiteUsername"),rs.getString("blackUsername"),rs.getString("gameName"),game));
+                    }
+                }
+            }
+            //Update Auths
+            preparedStatement = conn.prepareStatement("SELECT username, authToken FROM auths");
+            try(var rs = preparedStatement.executeQuery()){
+                MemoryAuthDAO access = MemoryAuthDAO.getInstance();
+                while(rs.next()){
+                    if(access.getAuth(rs.getString("authToken")) == null){
+                        access.addAuth(rs.getString("username"),rs.getString("authToken"));
+                    }
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

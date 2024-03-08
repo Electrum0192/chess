@@ -96,5 +96,6 @@ public class GameService {
             newGame = game;
         }
         access.setGame(newGame);
+        new SQLGameDAO().updatePlayers(gameID,requestColor,username);
     }
 }
