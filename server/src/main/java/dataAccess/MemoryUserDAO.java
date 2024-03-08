@@ -1,6 +1,7 @@
 package dataAccess;
 
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,7 +25,8 @@ public class MemoryUserDAO implements UserDAO{
 
     @Override
     public void createUser(String username, String password, String email) {
-        UserData newUser = new UserData(username,password,email);
+        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+        UserData newUser = new UserData(username,encodedPassword,email);
         users.add(newUser);
     }
 

@@ -3,6 +3,7 @@ package service;
 import dataAccess.*;
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserService {
     /**
@@ -49,7 +50,8 @@ public class UserService {
         if(access.getUser(user.username()) == null){
             throw new Exception("Error: unauthorized");
         }
-        if(!access.getUser(user.username()).password().equals(user.password())){
+        BCryptPasswordEncoder coder = new BCryptPasswordEncoder();
+        if(!coder.matches(user.password(), access.getUser(user.username()).password())){
             throw new Exception("Error: unauthorized");
         }
         //Get new AuthData for user
