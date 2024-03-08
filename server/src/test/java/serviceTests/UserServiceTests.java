@@ -2,11 +2,9 @@ package serviceTests;
 
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryUserDAO;
-import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

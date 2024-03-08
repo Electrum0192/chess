@@ -2,6 +2,9 @@ package dataAccess;
 
 import model.UserData;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class SQLUserDAO implements UserDAO{
     @Override
     public void clear() {
@@ -31,15 +34,36 @@ public class SQLUserDAO implements UserDAO{
         try(var conn = DatabaseManager.getConnection()){
             var preparedStatement = conn.prepareStatement("SELECT password, email FROM users WHERE username=?");
             preparedStatement.setString(1,username);
-            try(var rs = preparedStatement.executeQuery()){
-                var password = rs.getString("password");
-                var email = rs.getString("email");
+            try(var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    var password = rs.getString("password");
+                    var email = rs.getString("email");
 
-                return new UserData(username,password,email);
+                    return new UserData(username, password, email);
+                }
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    public Collection<UserData> getUserCollection(){
+        Collection<UserData> users = new HashSet<>();
+        try(var conn = DatabaseManager.getConnection()){
+            var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM users");
+            try(var rs = preparedStatement.executeQuery()){
+                while(rs.next()) {
+                    var username = rs.getString("username");
+                    var password = rs.getString("password");
+                    var email = rs.getString("email");
+
+                    users.add(new UserData(username, password, email));
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return users;
     }
 }
