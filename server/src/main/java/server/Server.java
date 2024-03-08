@@ -12,7 +12,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         DatabaseManager.initialize();
-
+        DatabaseManager.updateMemory();
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearApp);

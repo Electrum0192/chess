@@ -99,4 +99,21 @@ public class SQLGameDAO implements GameDAO{
             System.out.println(e.getMessage());
         }
     }
+
+    public void updatePlayers(int ID, ChessGame.TeamColor team, String username){
+        String teamString;
+        if(team.equals(ChessGame.TeamColor.WHITE)){
+            teamString = "whiteUsername";
+        }else{teamString = "blackUsername";}
+
+        try(var conn = DatabaseManager.getConnection()){
+            var preparedStatement = conn.prepareStatement("UPDATE games SET ?=? WHERE gameID=?");
+            preparedStatement.setString(1,teamString);
+            preparedStatement.setString(2,username);
+            preparedStatement.setInt(3,ID);
+            preparedStatement.executeUpdate();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
 }

@@ -51,6 +51,15 @@ public class MemoryAuthDAO implements AuthDAO{
         }
     }
 
+    /**
+     * Adds an existing AuthData object to the memory database. Used in startup sync with SQL database.
+     * @param username
+     * @param authToken
+     */
+    public void addAuth(String username, String authToken){
+        auths.add(new AuthData(authToken, username));
+    }
+
     public Collection<AuthData> getAuthCollection(){return auths;}
 
     private String generateAuthToken(){

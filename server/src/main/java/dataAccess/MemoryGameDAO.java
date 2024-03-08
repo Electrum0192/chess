@@ -41,6 +41,15 @@ public class MemoryGameDAO implements GameDAO{
         return newGame.gameID();
     }
 
+    /**
+     * Adds an existing game to the memory database. Used in server startup updates.
+     * @param game GameData object with the existing game info
+     */
+    public void addGame(GameData game){
+        games.add(game);
+        nextID = games.size()+1;
+    }
+
     @Override
     public GameData getGame(int gameID) {
         for(var i : games){
