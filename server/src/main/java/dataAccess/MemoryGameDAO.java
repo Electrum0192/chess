@@ -22,6 +22,7 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void clear() {
         games.clear();
+        nextID=1;
     }
     @Override
     public Collection<Game> listGames(){
@@ -37,7 +38,7 @@ public class MemoryGameDAO implements GameDAO{
     public int createGame(String gameName) {
         GameData newGame = new GameData(nextID,null,null,gameName,new ChessGame());
         games.add(newGame);
-        nextID++;
+        nextID=games.size()+1;
         return newGame.gameID();
     }
 
@@ -47,7 +48,6 @@ public class MemoryGameDAO implements GameDAO{
      */
     public void addGame(GameData game){
         games.add(game);
-        nextID = games.size()+1;
     }
 
     @Override

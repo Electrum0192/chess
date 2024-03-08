@@ -79,17 +79,19 @@ public class SQLGameDAO implements GameDAO{
             var preparedStatement = conn.prepareStatement("SELECT whiteUsername, blackUsername, gameName, chessGame FROM games WHERE gameID=?");
             preparedStatement.setInt(1, gameID);
             try(var rs = preparedStatement.executeQuery()){
-                var whiteUsername = rs.getString("whiteUsername");
-                var blackUsername = rs.getString("blackUsername");
-                var gameName = rs.getString("gameName");
-                var gameString = rs.getString("chessGame");
+                while(rs.next()) {
+                    var whiteUsername = rs.getString("whiteUsername");
+                    var blackUsername = rs.getString("blackUsername");
+                    var gameName = rs.getString("gameName");
+                    var gameString = rs.getString("chessGame");
 
-                ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                    ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
 
-                return new GameData(gameID,whiteUsername,blackUsername,gameName,game);
+                    return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                }
             }
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("getGame: "+e.getMessage());
         }
         return null;
     }
@@ -109,14 +111,19 @@ public class SQLGameDAO implements GameDAO{
     public void updatePlayers(int ID, ChessGame.TeamColor team, String username){
         try(var conn = DatabaseManager.getConnection()){
             var preparedStatement = conn.prepareStatement("UPDATE games");
-            if(team.equals(ChessGame.TeamColor.WHITE)){
-                preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername=? WHERE gameID=?");
-            }else{
-                preparedStatement = conn.prepareStatement("UPDATE games SET blackUsername=? WHERE gameID=?");
+            if(team == null){
+                //Watch
+            }else {
+                //Join
+                if (team.equals(ChessGame.TeamColor.WHITE)) {
+                    preparedStatement = conn.prepareStatement("UPDATE games SET whiteUsername=? WHERE gameID=?");
+                } else {
+                    preparedStatement = conn.prepareStatement("UPDATE games SET blackUsername=? WHERE gameID=?");
+                }
+                preparedStatement.setString(1, username);
+                preparedStatement.setInt(2, ID);
+                preparedStatement.executeUpdate();
             }
-            preparedStatement.setString(1,username);
-            preparedStatement.setInt(2,ID);
-            preparedStatement.executeUpdate();
         }catch (Exception e){
             System.out.println("updatePlayers: "+e.getMessage());
         }
