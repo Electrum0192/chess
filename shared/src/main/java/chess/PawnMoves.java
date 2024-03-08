@@ -14,14 +14,7 @@ public class PawnMoves extends FindMoves {
             ChessPosition oneSpace = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
             if (board.getPiece(oneSpace) == null) {
                 if (myPosition.getRow() == 7) {
-                    ChessMove promoteRook = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.ROOK);
-                    ChessMove promoteKnight = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.KNIGHT);
-                    ChessMove promoteQueen = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.QUEEN);
-                    ChessMove promoteBishop = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.BISHOP);
-                    moves.add(promoteRook);
-                    moves.add(promoteKnight);
-                    moves.add(promoteQueen);
-                    moves.add(promoteBishop);
+                    addPromoMoves(myPosition,oneSpace);
                 } else {
                     ChessMove forward = new ChessMove(myPosition, oneSpace, null);
                     moves.add(forward);
@@ -111,14 +104,7 @@ public class PawnMoves extends FindMoves {
             ChessPosition oneSpace = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
             if (board.getPiece(oneSpace) == null) {
                 if (myPosition.getRow() == 2) {
-                    ChessMove promoteRook = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.ROOK);
-                    ChessMove promoteKnight = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.KNIGHT);
-                    ChessMove promoteQueen = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.QUEEN);
-                    ChessMove promoteBishop = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.BISHOP);
-                    moves.add(promoteRook);
-                    moves.add(promoteKnight);
-                    moves.add(promoteQueen);
-                    moves.add(promoteBishop);
+                    addPromoMoves(myPosition, oneSpace);
                 } else {
                     ChessMove forward = new ChessMove(myPosition, oneSpace, null);
                     moves.add(forward);
@@ -201,6 +187,17 @@ public class PawnMoves extends FindMoves {
         }
 
         return moves;
+    }
+
+    private void addPromoMoves(ChessPosition myPosition, ChessPosition oneSpace){
+        ChessMove promoteRook = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.ROOK);
+        ChessMove promoteKnight = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.KNIGHT);
+        ChessMove promoteQueen = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.QUEEN);
+        ChessMove promoteBishop = new ChessMove(myPosition, oneSpace, ChessPiece.PieceType.BISHOP);
+        moves.add(promoteRook);
+        moves.add(promoteKnight);
+        moves.add(promoteQueen);
+        moves.add(promoteBishop);
     }
     Collection<ChessMove> moves;
 }
