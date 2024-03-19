@@ -35,9 +35,7 @@ public class Server {
     private Object clearApp(Request req, Response res){
         return UserHandler.clearApp(res);
     }
-    private Object register(Request req, Response res){
-        return UserHandler.register(req,res);
-    }
+    private Object register(Request req, Response res){return UserHandler.register(req,res);}
     private Object login(Request req, Response res){
         return UserHandler.login(req,res);
     }

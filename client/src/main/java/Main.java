@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -28,7 +27,7 @@ public class Main {
     }
 
     private static void runClient(String serverUrl) throws Exception{
-        AuthData authData;
+        AuthData authData = new AuthData("Null", "Null");
 
         System.out.println(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE);
@@ -45,91 +44,132 @@ public class Main {
             String action = command[0];
 
             //Read command and create the http request
-            switch (setting) {
-                case "LOGGED_OUT":
-                    if (readEqual(action, "Help")) {
-                        System.out.println(helpText(setting));
-                    } else if (readEqual(action, "Quit")) {
-                        run = false;
-                    } else if (readEqual(action, "Login")) {
-                        URI uri = new URI(serverUrl + "/session");
-                        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            try {
+                switch (setting) {
+                    case "LOGGED_OUT":
+                        if (readEqual(action, "Help")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Quit")) {
+                            System.out.println("Goodbye");
+                            run = false;
+                        } else if (readEqual(action, "Login")) {
+                            URI uri = new URI(serverUrl + "/session");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
-                        http.setRequestMethod("POST");
+                            http.setRequestMethod("POST");
 
-                        StringBuilder body = new StringBuilder();
-                        body.append("{\"username\":\"");
-                        body.append(command[1]);
-                        body.append("\", \"password\":\"");
-                        body.append(command[2]);
-                        body.append("\"}");
+                            StringBuilder body = new StringBuilder();
+                            body.append("{\"username\":\"");
+                            body.append(command[1]);
+                            body.append("\", \"password\":\"");
+                            body.append(command[2]);
+                            body.append("\"}");
 
-                        writeRequestBody(body.toString(), http);
-                        http.connect();
+                            writeRequestBody(body.toString(), http);
+                            http.connect();
 
-                        if (http.getResponseCode() == 200) {
-                            authData = (AuthData) readResponseBody(http, AuthData.class);
-                            System.out.printf("Logged in as: %s", authData.username());
-                            setting = "LOGGED_IN";
+                            if (http.getResponseCode() == 200) {
+                                authData = (AuthData) readResponseBody(http, AuthData.class);
+                                System.out.printf("Logged in as: %s\n", authData.username());
+                                setting = "LOGGED_IN";
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
+                        } else if (readEqual(action, "Register")) {
+                            URI uri = new URI(serverUrl + "/user");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+                            http.setRequestMethod("POST");
+
+                            StringBuilder body = new StringBuilder();
+                            body.append("{\"username\":\"");
+                            body.append(command[1]);
+                            body.append("\", \"password\":\"");
+                            body.append(command[2]);
+                            body.append("\", \"email\":\"");
+                            body.append(command[3]);
+                            body.append("\"}");
+
+                            writeRequestBody(body.toString(), http);
+                            http.connect();
+
+                            if (http.getResponseCode() == 200) {
+                                authData = (AuthData) readResponseBody(http, AuthData.class);
+                                System.out.printf("New User Created! Logged in as: %s\n", authData.username());
+                                setting = "LOGGED_IN";
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
+                        } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
+                            if(command[1].equals("wotsirb123")) {
+                                URI uri = new URI(serverUrl + "/db");
+                                HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+                                http.setRequestMethod("DELETE");
+                                http.connect();
+                                if(http.getResponseCode() == 200){
+                                    System.out.println("Database cleared");
+                                }else{System.out.println("Error");}
+                            }
                         } else {
-                            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            throw new Exception("Unknown Command");
                         }
-                    } else if (readEqual(action, "Register")) {
-                        URI uri = new URI(serverUrl + "/user");
-                        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+                        break;
+                    case "LOGGED_IN":
+                        if (readEqual(action, "Help")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Logout")) {
+                            if (logout(authData, serverUrl)) {
+                                System.out.println(authData.username() + " has logged out. Thanks for playing!");
+                                authData = null;
+                                setting = "LOGGED_OUT";
+                            }
+                        } else if (readEqual(action, "Create")) {
 
-                        http.setRequestMethod("POST");
+                        } else if (readEqual(action, "List")) {
 
-                        StringBuilder body = new StringBuilder();
-                        body.append("{\"username\":\"");
-                        body.append(command[1]);
-                        body.append("\", \"password\":\"");
-                        body.append(command[2]);
-                        body.append("\", \"email\":\"");
-                        body.append(command[3]);
-                        body.append("\"}");
+                        } else if (readEqual(action, "Join")) {
 
-                        writeRequestBody(body.toString(), http);
-                        http.connect();
+                        } else if (readEqual(action, "Observe")) {
 
-                        if (http.getResponseCode() == 200) {
-                            authData = (AuthData) readResponseBody(http, AuthData.class);
-                            System.out.printf("New User Created! Logged in as: ", authData.username());
-                            setting = "LOGGED_IN";
+                        } else if (readEqual(action, "Quit")) {
+                            logout(authData, serverUrl);
+                            System.out.println("Goodbye");
+                            run = false;
+                        } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
+                            if(command[1].equals("wotsirb123")) {
+                                URI uri = new URI(serverUrl + "/db");
+                                HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+                                http.setRequestMethod("DELETE");
+                                http.connect();
+                            }
                         } else {
-                            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            throw new Exception("Unknown Command");
                         }
-                    } else {
-                        throw new Exception("Unknown Command");
-                    }
-                    break;
-                case "LOGGED_IN":
-                    if (readEqual(action, "Help")) {
-                        System.out.println(helpText(setting));
-                    } else if (readEqual(action, "Logout")) {
-
-                    } else if (readEqual(action, "Create")) {
-
-                    } else if (readEqual(action, "List")) {
-
-                    } else if (readEqual(action, "Join")) {
-
-                    } else if (readEqual(action, "Observe")) {
-
-                    } else if (readEqual(action, "Quit")) {
-                        //Logout
-                        //Quit Game
-                        run = false;
-                    } else {
-                        throw new Exception("Unknown Command");
-                    }
-                    break;
-                case "ingame":
-                    //Gameplay code here
-                    break;
+                        break;
+                    case "ingame":
+                        //Gameplay code here
+                        break;
+                }
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
         }
 
+    }
+
+    private static Boolean logout(AuthData authData, String serverUrl) throws Exception {
+        URI uri = new URI(serverUrl + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+        http.setRequestMethod("DELETE");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authData.authToken());
+        http.connect();
+
+        return http.getResponseCode() == 200;
     }
 
     private static Boolean readEqual(String input, String test){
@@ -151,9 +191,9 @@ public class Main {
         T responseBody;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, c);
+            responseBody = (T) new Gson().fromJson(inputStreamReader, c);
+            return responseBody;
         }
-        return responseBody;
     }
 
     private static String helpText(String setting){
