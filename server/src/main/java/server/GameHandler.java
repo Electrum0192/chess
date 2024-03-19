@@ -1,12 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
+import model.ErrorMessage;
 import model.GameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
-
-import java.util.Collection;
 
 public class GameHandler {
     public static Object listGames(Request req, Response res) {

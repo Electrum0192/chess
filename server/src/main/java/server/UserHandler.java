@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
+import model.ErrorMessage;
 import model.UserData;
 import service.GameService;
 import service.UserService;
