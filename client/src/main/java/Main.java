@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import model.AuthData;
 import model.ErrorMessage;
+import model.GameID;
 import ui.EscapeSequences;
 
 import java.io.IOException;
@@ -125,7 +126,28 @@ public class Main {
                                 setting = "LOGGED_OUT";
                             }
                         } else if (readEqual(action, "Create")) {
+                            URI uri = new URI(serverUrl + "/game");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
+                            http.setRequestMethod("POST");
+
+                            http.setDoOutput(true);
+                            http.addRequestProperty("authorization", authData.authToken());
+
+                            StringBuilder body = new StringBuilder();
+                            body.append("{\"gamename\":\"");
+                            body.append(command[1]);
+                            body.append("\"}");
+
+                            writeRequestBody(body.toString(), http);
+                            http.connect();
+
+                            if (http.getResponseCode() == 200) {
+                                GameID ID = (GameID) readResponseBody(http, GameID.class);
+                                System.out.printf("New game created with ID: %d\n", ID.gameID());
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
                         } else if (readEqual(action, "List")) {
 
                         } else if (readEqual(action, "Join")) {

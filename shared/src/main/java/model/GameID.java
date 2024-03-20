@@ -1,4 +1,4 @@
-package server;
+package model;
 
 /**
  * A record of a game's ID, used to respond to endpoint requests
