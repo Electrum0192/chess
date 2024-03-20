@@ -7,6 +7,7 @@ import chess.ChessGame;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -23,7 +24,7 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public Collection<Game> listGames() {
-        Collection<Game> list = new HashSet<>();
+        Collection<Game> list = new ArrayList<>();
 
         try(var conn = DatabaseManager.getConnection()){
             var preparedStatement = conn.prepareStatement("SELECT gameID, whiteUsername, blackUsername, gameName FROM games");
@@ -55,7 +56,6 @@ public class SQLGameDAO implements GameDAO{
             while(result.next()) {
                 size = result.getInt(1);
             }
-
             preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES(?, ?, ?, ?, ?)");
             preparedStatement.setInt(1, size+1);
             preparedStatement.setString(2, null);

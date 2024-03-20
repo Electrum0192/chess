@@ -1,9 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
-import dataAccess.SQLGameDAO;
+import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 import model.Game;
@@ -25,12 +23,12 @@ public class GameService {
      */
     public Collection<Game> listGames(String authToken) throws Exception {
         //Have valid authToken
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        if(authAccess.getAuth(authToken) == null){
+        SQLAuthDAO dataAccess = new SQLAuthDAO();
+        if(dataAccess.getAuth(authToken) == null){
             throw new Exception("Error: unauthorized");
         }
         //Get Games
-        MemoryGameDAO access = MemoryGameDAO.getInstance();
+        SQLGameDAO access = new SQLGameDAO();
         return access.listGames();
     }
     /**
@@ -40,12 +38,14 @@ public class GameService {
     public int createGame(String authToken, String gameName) throws Exception {
         //Have valid authToken
         MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        if(authAccess.getAuth(authToken) == null){
+        SQLAuthDAO dataAuthAccess = new SQLAuthDAO();
+        if(dataAuthAccess.getAuth(authToken) == null){
             throw new Exception("Error: unauthorized");
         }
         //Does game with that name already exist?
         MemoryGameDAO access = MemoryGameDAO.getInstance();
-        Collection<Game> games = access.listGames();
+        SQLGameDAO dataAccess = new SQLGameDAO();
+        Collection<Game> games = dataAccess.listGames();
         for(var i : games){
             if(i.gameName().equals(gameName)){
                 throw new Exception("Error: bad request");
@@ -63,12 +63,12 @@ public class GameService {
      */
     public void joinGame(String authToken, int gameID, ChessGame.TeamColor requestColor) throws Exception {
         //Is User authorized?
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        SQLAuthDAO authAccess = new SQLAuthDAO();
         if(authAccess.getAuth(authToken) == null) {
             throw new Exception("Error: unauthorized");
         }
         //Does game with that ID exist?
-        MemoryGameDAO access = MemoryGameDAO.getInstance();
+        SQLGameDAO access = new SQLGameDAO();
         if(access.getGame(gameID) == null){
             throw new Exception("Error: bad request");
         }
@@ -96,7 +96,7 @@ public class GameService {
             //Observer
             newGame = game;
         }
-        access.setGame(newGame);
+        MemoryGameDAO.getInstance().setGame(newGame);
         new SQLGameDAO().updatePlayers(gameID,requestColor,username);
     }
 }

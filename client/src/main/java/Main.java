@@ -1,7 +1,5 @@
 import com.google.gson.Gson;
-import model.AuthData;
-import model.ErrorMessage;
-import model.GameID;
+import model.*;
 import ui.EscapeSequences;
 
 import java.io.IOException;
@@ -9,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class Main {
@@ -30,8 +29,8 @@ public class Main {
     private static void runClient(String serverUrl) throws Exception{
         AuthData authData = new AuthData("Null", "Null");
 
-        System.out.println(EscapeSequences.SET_BG_COLOR_DARK_GREY);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE);
+        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
 
         //Loop for user input/client output
         Boolean run = true;
@@ -135,7 +134,7 @@ public class Main {
                             http.addRequestProperty("authorization", authData.authToken());
 
                             StringBuilder body = new StringBuilder();
-                            body.append("{\"gamename\":\"");
+                            body.append("{\"gameName\":\"");
                             body.append(command[1]);
                             body.append("\"}");
 
@@ -149,7 +148,22 @@ public class Main {
                                 ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
                             }
                         } else if (readEqual(action, "List")) {
+                            URI uri = new URI(serverUrl + "/game");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
+                            http.setRequestMethod("GET");
+
+                            http.setDoOutput(true);
+                            http.addRequestProperty("authorization", authData.authToken());
+
+                            http.connect();
+
+                            if (http.getResponseCode() == 200) {
+                                GameList list = (GameList) readResponseBody(http, GameList.class);
+                                printList(list);
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
                         } else if (readEqual(action, "Join")) {
 
                         } else if (readEqual(action, "Observe")) {
@@ -179,6 +193,34 @@ public class Main {
             }
         }
 
+    }
+
+    private static void printList(GameList list){
+        Collection<Game> games = list.games();
+        System.out.printf("Found %d games:\n",games.size());
+        boolean flip = true;
+        for(var i : games){
+            if(flip){
+                System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
+                flip = false;
+            }else{
+                System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_DARK_GREY);
+                flip = true;
+            }
+            StringBuilder builder = new StringBuilder();
+            builder.append(i.gameID());
+            builder.append(" | ");
+            builder.append(i.gameName());
+            builder.append(" | W: ");
+            builder.append(i.whiteUsername());
+            builder.append(" | B: ");
+            builder.append(i.blackUsername());
+            System.out.println(builder.toString());
+        }
+        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
     private static Boolean logout(AuthData authData, String serverUrl) throws Exception {

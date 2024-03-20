@@ -34,7 +34,7 @@ public class SQLAuthDAO implements AuthDAO{
             preparedStatement.executeUpdate();
             return authData;
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("SQLAuthDao.createAuth: "+e.getMessage());
         }
         return null;
     }
@@ -45,11 +45,13 @@ public class SQLAuthDAO implements AuthDAO{
             var preparedStatement = conn.prepareStatement("SELECT username FROM auths WHERE authToken=?");
             preparedStatement.setString(1, authToken);
             try(var rs = preparedStatement.executeQuery()){
-                var username = rs.getString("username");
-                return new AuthData(authToken,username);
+                while(rs.next()) {
+                    var username = rs.getString("username");
+                    return new AuthData(authToken, username);
+                }
             }
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("SQLAuthDao.getAuth: "+e.getMessage());
         }
         return null;
     }

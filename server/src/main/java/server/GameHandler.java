@@ -1,9 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import model.ErrorMessage;
-import model.GameData;
-import model.GameID;
+import model.*;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -30,7 +28,7 @@ public class GameHandler {
 
     public static Object createGame(Request req, Response res) {
         GameService gameService = new GameService();
-        var gameName = new Gson().fromJson(req.body(), GameData.class);
+        var gameName = new Gson().fromJson(req.body(), GameName.class);
         try{
             var auth = parseAuth(req,res);
             GameID ID = new GameID(gameService.createGame(auth,gameName.gameName()));

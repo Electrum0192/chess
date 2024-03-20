@@ -22,8 +22,9 @@ public class UserService {
      */
     public AuthData register(UserData user) throws Exception {
         MemoryUserDAO access = MemoryUserDAO.getInstance();
+        SQLUserDAO dataAccess = new SQLUserDAO();
         //Check if user already exists
-        if(access.getUser(user.username()) != null){
+        if(dataAccess.getUser(user.username()) != null){
             throw new Exception("Error: already taken");
         }
         //Check if UserData contains a password
@@ -46,12 +47,13 @@ public class UserService {
      */
     public AuthData login(UserData user) throws Exception {
         MemoryUserDAO access = MemoryUserDAO.getInstance();
+        SQLUserDAO dataAccess = new SQLUserDAO();
         //Check if user exists and password is correct
-        if(access.getUser(user.username()) == null){
+        if(dataAccess.getUser(user.username()) == null){
             throw new Exception("Error: unauthorized");
         }
         BCryptPasswordEncoder coder = new BCryptPasswordEncoder();
-        if(!coder.matches(user.password(), access.getUser(user.username()).password())){
+        if(!coder.matches(user.password(), dataAccess.getUser(user.username()).password())){
             throw new Exception("Error: unauthorized");
         }
         //Get new AuthData for user
@@ -65,8 +67,9 @@ public class UserService {
      */
     public void logout(String auth) throws Exception {
         MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
+        SQLAuthDAO dataAccess = new SQLAuthDAO();
         //Is auth in database? AKA is user authorized
-        if(authAccess.getAuth(auth) == null){
+        if(dataAccess.getAuth(auth) == null){
             throw new Exception("Error: unauthorized");
         }
         //Logout the user
