@@ -115,6 +115,7 @@ public class Main {
                         } else if (readEqual(action, "Observe")) {
                             ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
                             System.out.printf("Now observing game #%s.\n",command[1]);
+
                         } else if (readEqual(action, "Quit")) {
                             ServerFacade.logout(serverUrl,authData.authToken());
                             System.out.println("Goodbye");
@@ -126,6 +127,9 @@ public class Main {
 
                                 http.setRequestMethod("DELETE");
                                 http.connect();
+                                if(http.getResponseCode() == 200){
+                                    System.out.println("Database cleared");
+                                }else{System.out.println("Error");}
                             }
                         } else {
                             throw new Exception("Unknown Command");
