@@ -60,7 +60,7 @@ public class GameHandler {
                 team = ChessGame.TeamColor.WHITE;
             }else if(request.playerColor().equals("BLACK")){
                 team = ChessGame.TeamColor.BLACK;
-            }else if(request.playerColor().equals("null")){
+            }else if(request.playerColor().equals("NULL")){
                 team = null;
             }else{
                 throw new Exception("Error: bad request");

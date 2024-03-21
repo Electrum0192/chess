@@ -94,7 +94,6 @@ public class ServerFacade {
             throw new Exception(response.message());
         }
     }
-
     public static GameList list(String url, String authToken) throws Exception{
         URI uri = new URI(url + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -108,6 +107,30 @@ public class ServerFacade {
         if(http.getResponseCode() == 200){
             return (GameList) readResponseBody(http, GameList.class);
         }else{
+            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(response.message());
+        }
+    }
+    public static void join(String url, String authToken, int gameID, String requestColor) throws Exception{
+        URI uri = new URI(url + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+        http.setRequestMethod("PUT");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+
+        StringBuilder body = new StringBuilder();
+        body.append("{\"playerColor\":\"");
+        body.append(requestColor.toUpperCase());
+        body.append("\", \"gameID\":");
+        body.append(gameID);
+        body.append("}");
+        writeRequestBody(body.toString(), http);
+
+        http.connect();
+
+        if(http.getResponseCode() != 200){
             ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
             throw new Exception(response.message());
         }

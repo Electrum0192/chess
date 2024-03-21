@@ -99,64 +99,22 @@ public class Main {
 
                         } else if (readEqual(action, "List")) {
                             printList(ServerFacade.list(serverUrl,authData.authToken()));
+
                         } else if (readEqual(action, "Join")) {
-                            URI uri = new URI(serverUrl + "/game");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-
-                            http.setRequestMethod("PUT");
-
-                            http.setDoOutput(true);
-                            http.addRequestProperty("authorization", authData.authToken());
-
-                            StringBuilder body = new StringBuilder();
-                            body.append("{\"playerColor\":\"");
-                            if(command.length == 3) {
-                                body.append(command[2].toUpperCase());
-                            }else{
-                                body.append("null");
-                            }
-                            body.append("\", \"gameID\":");
-                            body.append(command[1]);
-                            body.append("}");
-                            writeRequestBody(body.toString(), http);
-
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                if(command.length == 3) {
-                                    System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
-                                }else{
-                                    System.out.println("Successfully joined game "+command[1]);
-                                }
+                            if(command.length==3) {
+                                ServerFacade.join(serverUrl, authData.authToken(), Integer.parseInt(command[1]), command[2]);
+                                System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
                                 System.out.println("Loading game:");
                                 setting = "ingame";
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }else{
+                                //requestColor = empty aka null
+                                ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                                System.out.printf("Now observing game #%s.\n",command[1]);
                             }
+
                         } else if (readEqual(action, "Observe")) {
-                            URI uri = new URI(serverUrl + "/game");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-
-                            http.setRequestMethod("PUT");
-
-                            http.setDoOutput(true);
-                            http.addRequestProperty("authorization", authData.authToken());
-
-                            StringBuilder body = new StringBuilder();
-                            body.append("{\"playerColor\":\"");
-                            body.append("null");
-                            body.append("\", \"gameID\":");
-                            body.append(command[1]);
-                            body.append("}");
-                            writeRequestBody(body.toString(), http);
-
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                System.out.println("Loading game "+command[1]);
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-                            }
+                            ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                            System.out.printf("Now observing game #%s.\n",command[1]);
                         } else if (readEqual(action, "Quit")) {
                             ServerFacade.logout(serverUrl,authData.authToken());
                             System.out.println("Goodbye");
