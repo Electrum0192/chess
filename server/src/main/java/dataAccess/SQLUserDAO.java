@@ -32,10 +32,11 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public UserData getUser(String username) {
         try(var conn = DatabaseManager.getConnection()){
-            var preparedStatement = conn.prepareStatement("SELECT password, email FROM users WHERE username=?");
+            var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM users WHERE username=?");
             preparedStatement.setString(1,username);
             try(var rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
+                    System.out.println(rs.getString("username")+" "+rs.getString("password"));
                     var password = rs.getString("password");
                     var email = rs.getString("email");
 

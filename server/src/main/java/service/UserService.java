@@ -31,9 +31,12 @@ public class UserService {
         if(user.password() == null){
             throw new Exception("Error: bad request");
         }
+        //Encrypt Password
+        BCryptPasswordEncoder coder = new BCryptPasswordEncoder();
+        String cryptedPassword = coder.encode(user.password());
         //Create User
         access.createUser(user.username(), user.password(), user.email());
-        new SQLUserDAO().createUser(user.username(), user.password(), user.email());
+        new SQLUserDAO().createUser(user.username(), cryptedPassword, user.email());
         //Get new AuthData for user
         //MUST CREATE IN MEMORY FIRST TO ENSURE AUTHTOKEN IS THE SAME
         MemoryAuthDAO.getInstance().createAuth(user.username());
@@ -54,6 +57,7 @@ public class UserService {
         }
         BCryptPasswordEncoder coder = new BCryptPasswordEncoder();
         if(!coder.matches(user.password(), dataAccess.getUser(user.username()).password())){
+            System.out.println("FLAG");
             throw new Exception("Error: unauthorized");
         }
         //Get new AuthData for user
