@@ -1,10 +1,7 @@
 package ui;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.ErrorMessage;
-import model.GameID;
-import model.UserData;
+import model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,6 +89,24 @@ public class ServerFacade {
         if(http.getResponseCode() == 200){
             GameID ID = (GameID) readResponseBody(http, GameID.class);
             return ID.gameID();
+        }else{
+            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(response.message());
+        }
+    }
+
+    public static GameList list(String url, String authToken) throws Exception{
+        URI uri = new URI(url + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+        http.setRequestMethod("GET");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+        if(http.getResponseCode() == 200){
+            return (GameList) readResponseBody(http, GameList.class);
         }else{
             ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
             throw new Exception(response.message());

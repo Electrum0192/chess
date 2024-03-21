@@ -98,22 +98,7 @@ public class Main {
                             System.out.printf("New game created with ID: %d\n", gameID);
 
                         } else if (readEqual(action, "List")) {
-                            URI uri = new URI(serverUrl + "/game");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-
-                            http.setRequestMethod("GET");
-
-                            http.setDoOutput(true);
-                            http.addRequestProperty("authorization", authData.authToken());
-
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                GameList list = (GameList) readResponseBody(http, GameList.class);
-                                printList(list);
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-                            }
+                            printList(ServerFacade.list(serverUrl,authData.authToken()));
                         } else if (readEqual(action, "Join")) {
                             URI uri = new URI(serverUrl + "/game");
                             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -315,7 +300,7 @@ public class Main {
 
     private static void printList(GameList list){
         Collection<Game> games = list.games();
-        System.out.printf("Found %d games:\n",games.size());
+        System.out.printf("Found %d game(s):\n",games.size());
         boolean flip = true;
         for(var i : games){
             if(flip){
