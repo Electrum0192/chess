@@ -1,3 +1,7 @@
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.*;
 import ui.EscapeSequences;
@@ -36,8 +40,9 @@ public class Main {
         Boolean run = true;
         String setting = "LOGGED_OUT";
         while(run){
+            //if(authData != null){System.out.println(authData.toString());} //For Debugging
             //Get user input
-            System.out.printf("[%s] >>> ",setting);
+            if(!setting.equals("ingame")){System.out.printf("[%s] >>> ",setting);}
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             var command = line.split(" ");
@@ -165,7 +170,39 @@ public class Main {
                                 ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
                             }
                         } else if (readEqual(action, "Join")) {
+                            URI uri = new URI(serverUrl + "/game");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
+                            http.setRequestMethod("PUT");
+
+                            http.setDoOutput(true);
+                            http.addRequestProperty("authorization", authData.authToken());
+
+                            StringBuilder body = new StringBuilder();
+                            body.append("{\"playerColor\":\"");
+                            if(command.length == 3) {
+                                body.append(command[2].toUpperCase());
+                            }else{
+                                body.append("null");
+                            }
+                            body.append("\", \"gameID\":");
+                            body.append(command[1]);
+                            body.append("}");
+                            writeRequestBody(body.toString(), http);
+
+                            http.connect();
+
+                            if (http.getResponseCode() == 200) {
+                                if(command.length == 3) {
+                                    System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
+                                }else{
+                                    System.out.println("Successfully joined game "+command[1]);
+                                }
+                                System.out.println("Loading game:");
+                                setting = "ingame";
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
                         } else if (readEqual(action, "Observe")) {
 
                         } else if (readEqual(action, "Quit")) {
@@ -185,6 +222,15 @@ public class Main {
                         }
                         break;
                     case "ingame":
+                        if(readEqual(action, "Quit")){
+                            logout(authData, serverUrl);
+                            System.out.println("Goodbye");
+                            run = false;
+                        }
+                        //FILLER BOARD FOR PROJECT 5
+                        ChessBoard board = new ChessBoard();
+                        board.resetBoard();
+                        printBoard(board);
                         //Gameplay code here
                         break;
                 }
@@ -193,6 +239,111 @@ public class Main {
             }
         }
 
+    }
+
+    private static void printBoard(ChessBoard board){
+        //Frontwards
+        System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+        for(int r = 1; r <= 8; r++){
+            System.out.print(EscapeSequences.EMPTY);
+            for(int c = 1; c <= 8; c++){
+                if((r+c)%2 == 0){
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }else{System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);}
+                //PRINT PIECE, SET TEXT COLOR TO PIECE TEAM
+                ChessPiece piece = board.getPiece(new ChessPosition(r,c));
+                if(piece == null){
+                    System.out.print(EscapeSequences.EMPTY);
+                }else {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        if (type.equals(ChessPiece.PieceType.PAWN)) {
+                            System.out.print(EscapeSequences.WHITE_PAWN);
+                        } else if (type.equals(ChessPiece.PieceType.ROOK)) {
+                            System.out.print(EscapeSequences.WHITE_ROOK);
+                        } else if (type.equals(ChessPiece.PieceType.KNIGHT)) {
+                            System.out.print(EscapeSequences.WHITE_KNIGHT);
+                        } else if (type.equals(ChessPiece.PieceType.BISHOP)) {
+                            System.out.print(EscapeSequences.WHITE_BISHOP);
+                        } else if (type.equals(ChessPiece.PieceType.QUEEN)) {
+                            System.out.print(EscapeSequences.WHITE_QUEEN);
+                        } else if (type.equals(ChessPiece.PieceType.KING)) {
+                            System.out.print(EscapeSequences.WHITE_KING);
+                        }
+                    } else {
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+                        if (type.equals(ChessPiece.PieceType.PAWN)) {
+                            System.out.print(EscapeSequences.BLACK_PAWN);
+                        } else if (type.equals(ChessPiece.PieceType.ROOK)) {
+                            System.out.print(EscapeSequences.BLACK_ROOK);
+                        } else if (type.equals(ChessPiece.PieceType.KNIGHT)) {
+                            System.out.print(EscapeSequences.BLACK_KNIGHT);
+                        } else if (type.equals(ChessPiece.PieceType.BISHOP)) {
+                            System.out.print(EscapeSequences.BLACK_BISHOP);
+                        } else if (type.equals(ChessPiece.PieceType.QUEEN)) {
+                            System.out.print(EscapeSequences.BLACK_QUEEN);
+                        } else if (type.equals(ChessPiece.PieceType.KING)) {
+                            System.out.print(EscapeSequences.BLACK_KING);
+                        }
+                    }
+                }
+            }
+            System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+        }
+        System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+        //Backwards
+        System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+        for(int r = 8; r >= 1; r--){
+            System.out.print(EscapeSequences.EMPTY);
+            for(int c = 8; c >= 1; c--){
+                if((r+c)%2 == 0){
+                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                }else{System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);}
+                //PRINT PIECE, SET TEXT COLOR TO PIECE TEAM
+                ChessPiece piece = board.getPiece(new ChessPosition(r,c));
+                if(piece == null){
+                    System.out.print(EscapeSequences.EMPTY);
+                }else {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        if (type.equals(ChessPiece.PieceType.PAWN)) {
+                            System.out.print(EscapeSequences.WHITE_PAWN);
+                        } else if (type.equals(ChessPiece.PieceType.ROOK)) {
+                            System.out.print(EscapeSequences.WHITE_ROOK);
+                        } else if (type.equals(ChessPiece.PieceType.KNIGHT)) {
+                            System.out.print(EscapeSequences.WHITE_KNIGHT);
+                        } else if (type.equals(ChessPiece.PieceType.BISHOP)) {
+                            System.out.print(EscapeSequences.WHITE_BISHOP);
+                        } else if (type.equals(ChessPiece.PieceType.QUEEN)) {
+                            System.out.print(EscapeSequences.WHITE_QUEEN);
+                        } else if (type.equals(ChessPiece.PieceType.KING)) {
+                            System.out.print(EscapeSequences.WHITE_KING);
+                        }
+                    } else {
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
+                        if (type.equals(ChessPiece.PieceType.PAWN)) {
+                            System.out.print(EscapeSequences.BLACK_PAWN);
+                        } else if (type.equals(ChessPiece.PieceType.ROOK)) {
+                            System.out.print(EscapeSequences.BLACK_ROOK);
+                        } else if (type.equals(ChessPiece.PieceType.KNIGHT)) {
+                            System.out.print(EscapeSequences.BLACK_KNIGHT);
+                        } else if (type.equals(ChessPiece.PieceType.BISHOP)) {
+                            System.out.print(EscapeSequences.BLACK_BISHOP);
+                        } else if (type.equals(ChessPiece.PieceType.QUEEN)) {
+                            System.out.print(EscapeSequences.BLACK_QUEEN);
+                        } else if (type.equals(ChessPiece.PieceType.KING)) {
+                            System.out.print(EscapeSequences.BLACK_KING);
+                        }
+                    }
+                }
+            }
+            System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+        }
+        //Reset Color Stuff
+        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
     private static void printList(GameList list){

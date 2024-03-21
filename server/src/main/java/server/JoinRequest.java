@@ -5,5 +5,5 @@ import chess.ChessGame;
 /**
  * Request format for JoinGame endpoint
  */
-public record JoinRequest(ChessGame.TeamColor playerColor, int gameID) {
+public record JoinRequest(String playerColor, int gameID) {
 }

@@ -97,8 +97,7 @@ public class ChessBoard {
             }
             builder.append("|\n");
         }
-        String output = builder.toString();
-        return output;
+        return builder.toString();
     }
 
     /**
@@ -341,8 +340,6 @@ public class ChessBoard {
         ChessPiece bKing = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
         tempPos = new ChessPosition(8,5);
         addPiece(tempPos,bKing);
-
-        System.out.println(toString());
 
     }
 

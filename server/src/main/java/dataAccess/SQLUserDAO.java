@@ -36,7 +36,6 @@ public class SQLUserDAO implements UserDAO{
             preparedStatement.setString(1,username);
             try(var rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
-                    System.out.println(rs.getString("username")+" "+rs.getString("password"));
                     var password = rs.getString("password");
                     var email = rs.getString("email");
 

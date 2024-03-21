@@ -3,6 +3,7 @@ package dataAccess;
 import model.AuthData;
 
 import java.util.Collection;
+import java.util.Random;
 
 public class SQLAuthDAO implements AuthDAO{
     @Override
@@ -21,18 +22,11 @@ public class SQLAuthDAO implements AuthDAO{
             var preparedStatement = conn.prepareStatement("INSERT INTO auths (username, authToken) VALUES(?, ?)");
             preparedStatement.setString(1, username);
 
-            AuthData authData = null;
-            Collection<AuthData> all = MemoryAuthDAO.getInstance().getAuthCollection();
-            for(var i : all){
-                if(i.username().equals(username)){
-                    preparedStatement.setString(2,i.authToken());
-                    authData = new AuthData(i.authToken(),username);
-                    break;
-                }
-            }
+            String authToken = generateAuthToken();
+            preparedStatement.setString(2,authToken);
 
             preparedStatement.executeUpdate();
-            return authData;
+            return new AuthData(authToken,username);
         }catch (Exception e){
             System.out.println("SQLAuthDao.createAuth: "+e.getMessage());
         }
@@ -42,13 +36,15 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public AuthData getAuth(String authToken) {
         try(var conn = DatabaseManager.getConnection()){
-            var preparedStatement = conn.prepareStatement("SELECT username FROM auths WHERE authToken=?");
+            var preparedStatement = conn.prepareStatement("SELECT authToken, username FROM auths WHERE authToken=?");
             preparedStatement.setString(1, authToken);
             try(var rs = preparedStatement.executeQuery()){
                 while(rs.next()) {
                     var username = rs.getString("username");
                     return new AuthData(authToken, username);
                 }
+            }catch (Exception e){
+                System.out.println("SQLAuthDao.getAuth.executeQuery: "+e.getMessage());
             }
         }catch (Exception e){
             System.out.println("SQLAuthDao.getAuth: "+e.getMessage());
@@ -64,6 +60,39 @@ public class SQLAuthDAO implements AuthDAO{
             preparedStatement.executeUpdate();
         }catch (Exception e){
             System.out.println(e.getMessage());
+        }
+    }
+
+    private String generateAuthToken(){
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 5;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        String generatedString = buffer.toString();
+
+        return generatedString;
+    }
+
+    public void printAll(){
+        try(var conn = DatabaseManager.getConnection()){
+            var preparedStatement = conn.prepareStatement("SELECT authToken, username FROM auths");
+            try(var rs = preparedStatement.executeQuery()){
+                while(rs.next()) {
+                    System.out.print(rs.getString("authToken"));
+                    System.out.print(":");
+                    System.out.println(rs.getString("username"));
+                }
+            }catch (Exception e){
+                System.out.println("SQLAuthDao.printAll.executeQuery: "+e.getMessage());
+            }
+        }catch (Exception e){
+            System.out.println("SQLAuthDao.printAll: "+e.getMessage());
         }
     }
 }

@@ -38,8 +38,6 @@ public class UserService {
         access.createUser(user.username(), user.password(), user.email());
         new SQLUserDAO().createUser(user.username(), cryptedPassword, user.email());
         //Get new AuthData for user
-        //MUST CREATE IN MEMORY FIRST TO ENSURE AUTHTOKEN IS THE SAME
-        MemoryAuthDAO.getInstance().createAuth(user.username());
         return new SQLAuthDAO().createAuth(user.username());
     }
 
@@ -61,8 +59,7 @@ public class UserService {
             throw new Exception("Error: unauthorized");
         }
         //Get new AuthData for user
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
-        return authAccess.createAuth(user.username());
+        return new SQLAuthDAO().createAuth(user.username());
     }
 
     /**

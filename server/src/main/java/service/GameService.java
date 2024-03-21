@@ -37,7 +37,6 @@ public class GameService {
      */
     public int createGame(String authToken, String gameName) throws Exception {
         //Have valid authToken
-        MemoryAuthDAO authAccess = MemoryAuthDAO.getInstance();
         SQLAuthDAO dataAuthAccess = new SQLAuthDAO();
         if(dataAuthAccess.getAuth(authToken) == null){
             throw new Exception("Error: unauthorized");

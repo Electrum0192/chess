@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
 import service.GameService;
@@ -54,7 +55,17 @@ public class GameHandler {
         var request = new Gson().fromJson(req.body(), JoinRequest.class);
         try{
             var auth = parseAuth(req,res);
-            gameService.joinGame(auth, request.gameID(), request.playerColor());
+            ChessGame.TeamColor team;
+            if(request.playerColor().equals("WHITE")){
+                team = ChessGame.TeamColor.WHITE;
+            }else if(request.playerColor().equals("BLACK")){
+                team = ChessGame.TeamColor.BLACK;
+            }else if(request.playerColor().equals("null")){
+                team = null;
+            }else{
+                throw new Exception("Error: bad request");
+            }
+            gameService.joinGame(auth, request.gameID(), team);
             return new Gson().toJson(null);
         }catch (Exception e){
             var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
