@@ -64,30 +64,11 @@ public class Main {
                             setting = "LOGGED_IN";
 
                         } else if (readEqual(action, "Register")) {
-                            URI uri = new URI(serverUrl + "/user");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+                            UserData newUser = new UserData(command[1],command[2],command[3]);
+                            authData = ServerFacade.register(serverUrl,newUser);
+                            System.out.printf("New User Created! Logged in as: %s\n", authData.username());
+                            setting = "LOGGED_IN";
 
-                            http.setRequestMethod("POST");
-
-                            StringBuilder body = new StringBuilder();
-                            body.append("{\"username\":\"");
-                            body.append(command[1]);
-                            body.append("\", \"password\":\"");
-                            body.append(command[2]);
-                            body.append("\", \"email\":\"");
-                            body.append(command[3]);
-                            body.append("\"}");
-
-                            writeRequestBody(body.toString(), http);
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                authData = (AuthData) readResponseBody(http, AuthData.class);
-                                System.out.printf("New User Created! Logged in as: %s\n", authData.username());
-                                setting = "LOGGED_IN";
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-                            }
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
                                 URI uri = new URI(serverUrl + "/db");
@@ -113,28 +94,9 @@ public class Main {
                                 setting = "LOGGED_OUT";
                             }
                         } else if (readEqual(action, "Create")) {
-                            URI uri = new URI(serverUrl + "/game");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+                            int gameID = ServerFacade.create(serverUrl,authData.authToken(),command[1]);
+                            System.out.printf("New game created with ID: %d\n", gameID);
 
-                            http.setRequestMethod("POST");
-
-                            http.setDoOutput(true);
-                            http.addRequestProperty("authorization", authData.authToken());
-
-                            StringBuilder body = new StringBuilder();
-                            body.append("{\"gameName\":\"");
-                            body.append(command[1]);
-                            body.append("\"}");
-
-                            writeRequestBody(body.toString(), http);
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                GameID ID = (GameID) readResponseBody(http, GameID.class);
-                                System.out.printf("New game created with ID: %d\n", ID.gameID());
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-                            }
                         } else if (readEqual(action, "List")) {
                             URI uri = new URI(serverUrl + "/game");
                             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
