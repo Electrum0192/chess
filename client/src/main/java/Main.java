@@ -204,7 +204,29 @@ public class Main {
                                 ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
                             }
                         } else if (readEqual(action, "Observe")) {
+                            URI uri = new URI(serverUrl + "/game");
+                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
+                            http.setRequestMethod("PUT");
+
+                            http.setDoOutput(true);
+                            http.addRequestProperty("authorization", authData.authToken());
+
+                            StringBuilder body = new StringBuilder();
+                            body.append("{\"playerColor\":\"");
+                            body.append("null");
+                            body.append("\", \"gameID\":");
+                            body.append(command[1]);
+                            body.append("}");
+                            writeRequestBody(body.toString(), http);
+
+                            http.connect();
+
+                            if (http.getResponseCode() == 200) {
+                                System.out.println("Loading game "+command[1]);
+                            } else {
+                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+                            }
                         } else if (readEqual(action, "Quit")) {
                             logout(authData, serverUrl);
                             System.out.println("Goodbye");
