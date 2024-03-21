@@ -5,6 +5,7 @@ import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.*;
 import ui.EscapeSequences;
+import ui.ServerFacade;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,28 +59,10 @@ public class Main {
                             System.out.println("Goodbye");
                             run = false;
                         } else if (readEqual(action, "Login")) {
-                            URI uri = new URI(serverUrl + "/session");
-                            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+                            authData = ServerFacade.login(serverUrl, new UserData(command[1],command[2],null));
+                            System.out.printf("Logged in as: %s\n", authData.username());
+                            setting = "LOGGED_IN";
 
-                            http.setRequestMethod("POST");
-
-                            StringBuilder body = new StringBuilder();
-                            body.append("{\"username\":\"");
-                            body.append(command[1]);
-                            body.append("\", \"password\":\"");
-                            body.append(command[2]);
-                            body.append("\"}");
-
-                            writeRequestBody(body.toString(), http);
-                            http.connect();
-
-                            if (http.getResponseCode() == 200) {
-                                authData = (AuthData) readResponseBody(http, AuthData.class);
-                                System.out.printf("Logged in as: %s\n", authData.username());
-                                setting = "LOGGED_IN";
-                            } else {
-                                ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-                            }
                         } else if (readEqual(action, "Register")) {
                             URI uri = new URI(serverUrl + "/user");
                             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
