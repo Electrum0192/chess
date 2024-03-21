@@ -61,6 +61,18 @@ public class ServerFacade {
             throw new Exception(response.message());
         }
     }
+    public static boolean logout(String url, String authToken) throws Exception{
+        URI uri = new URI(url + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+        http.setRequestMethod("DELETE");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+        http.connect();
+
+        return http.getResponseCode() == 200;
+    }
     public static int create(String url, String authToken, String gamename) throws Exception{
         URI uri = new URI(url + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();

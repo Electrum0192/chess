@@ -88,7 +88,7 @@ public class Main {
                         if (readEqual(action, "Help")) {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Logout")) {
-                            if (logout(authData, serverUrl)) {
+                            if (ServerFacade.logout(serverUrl,authData.authToken())) {
                                 System.out.println(authData.username() + " has logged out. Thanks for playing!");
                                 authData = null;
                                 setting = "LOGGED_OUT";
@@ -173,7 +173,7 @@ public class Main {
                                 ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
                             }
                         } else if (readEqual(action, "Quit")) {
-                            logout(authData, serverUrl);
+                            ServerFacade.logout(serverUrl,authData.authToken());
                             System.out.println("Goodbye");
                             run = false;
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
@@ -190,7 +190,7 @@ public class Main {
                         break;
                     case "ingame":
                         if(readEqual(action, "Quit")){
-                            logout(authData, serverUrl);
+                            ServerFacade.logout(serverUrl,authData.authToken());
                             System.out.println("Goodbye");
                             run = false;
                         }
@@ -339,19 +339,6 @@ public class Main {
         }
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
-    }
-
-    private static Boolean logout(AuthData authData, String serverUrl) throws Exception {
-        URI uri = new URI(serverUrl + "/session");
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-
-        http.setRequestMethod("DELETE");
-
-        http.setDoOutput(true);
-        http.addRequestProperty("authorization", authData.authToken());
-        http.connect();
-
-        return http.getResponseCode() == 200;
     }
 
     private static Boolean readEqual(String input, String test){
