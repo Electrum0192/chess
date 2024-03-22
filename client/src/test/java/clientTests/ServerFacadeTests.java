@@ -5,6 +5,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.GameService;
 import ui.ServerFacade;
 
 import java.lang.reflect.Method;
@@ -90,6 +91,24 @@ public class ServerFacadeTests {
         //Unauthorized
         Exception exception = assertThrows(Exception.class, () -> {ServerFacade.logout(URL,"BADAUTHNOPEDONTDOIT");});
         Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+
+    }
+
+    @Test
+    @DisplayName("Create")
+    public void create() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ServerFacade.create(URL,auth.authToken(),"newgame");
+        Assertions.assertEquals(3, getDatabaseRows(), "Game was not successfully created");
+
+        //Negative cases
+        //Unauthorized
+        Exception exception = assertThrows(Exception.class, () -> {ServerFacade.create(URL,"BADAUTHNOPEDONTDOIT","game2");});
+        Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+        //Bad Request
+        exception = assertThrows(Exception.class, () -> {ServerFacade.create(URL, auth.authToken(),"newgame");});
+        Assertions.assertTrue(exception.getMessage().contains("400"),"Server did not throw 400 exception.");
 
     }
 
