@@ -28,7 +28,7 @@ public class UserService {
             throw new Exception("Error: already taken");
         }
         //Check if UserData contains a password
-        if(user.password() == null){
+        if(user.password() == null || user.password().equals("null")){
             throw new Exception("Error: bad request");
         }
         //Encrypt Password
