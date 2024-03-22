@@ -68,7 +68,13 @@ public class ServerFacade {
         http.addRequestProperty("authorization", authToken);
         http.connect();
 
-        return http.getResponseCode() == 200;
+        if(http.getResponseCode() == 200){
+            return true;
+        }else{
+            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(response.message());
+        }
+
     }
     public static int create(String url, String authToken, String gamename) throws Exception{
         URI uri = new URI(url + "/game");

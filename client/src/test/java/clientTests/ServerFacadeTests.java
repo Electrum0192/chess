@@ -7,6 +7,12 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
 
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -69,6 +75,69 @@ public class ServerFacadeTests {
         //Unauthorized (Wrong password)
         exception = assertThrows(Exception.class, () -> {ServerFacade.login(URL,new UserData("Steve","actuallyIncorrect",null));});
         Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+    }
+
+    @Test
+    @DisplayName("Logout")
+    public void logout() throws Exception {
+        //Positive case
+        ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        AuthData auth = ServerFacade.login(URL, new UserData("Steve", "incorrect", null));
+        ServerFacade.logout(URL,auth.authToken());
+        Assertions.assertEquals(2, getDatabaseRows(), "User was not successfully logged out.");
+
+        //Negative cases
+        //Unauthorized
+        Exception exception = assertThrows(Exception.class, () -> {ServerFacade.logout(URL,"BADAUTHNOPEDONTDOIT");});
+        Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+
+    }
+
+    private int getDatabaseRows() {
+        int rows = 0;
+        try {
+            Class<?> clazz = Class.forName("dataAccess.DatabaseManager");
+            Method getConnectionMethod = clazz.getDeclaredMethod("getConnection");
+            getConnectionMethod.setAccessible(true);
+
+            Object obj = clazz.getDeclaredConstructor().newInstance();
+            try (Connection conn = (Connection) getConnectionMethod.invoke(obj);) {
+                try (var statement = conn.createStatement()) {
+                    for (String table : getTables(conn)) {
+                        var sql = "SELECT count(*) FROM " + table;
+                        try (var resultSet = statement.executeQuery(sql)) {
+                            if (resultSet.next()) {
+                                rows += resultSet.getInt(1);
+                            }
+                        }
+                    }
+                }
+
+            }
+        } catch (Exception ex) {
+            Assertions.fail("Unable to load database in order to verify persistence. Are you using dataAccess.DatabaseManager to set your credentials?");
+        }
+
+        return rows;
+    }
+
+    private List<String> getTables(Connection conn) throws SQLException {
+        String sql = """
+                    SELECT table_name
+                    FROM information_schema.tables
+                    WHERE table_schema = DATABASE();
+                """;
+
+        List<String> tableNames = new ArrayList<>();
+        try (var preparedStatement = conn.prepareStatement(sql)) {
+            try (var resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    tableNames.add(resultSet.getString(1));
+                }
+            }
+        }
+
+        return tableNames;
     }
 
 }

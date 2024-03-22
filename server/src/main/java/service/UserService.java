@@ -74,5 +74,6 @@ public class UserService {
         }
         //Logout the user
         authAccess.deleteAuth(auth);
+        dataAccess.deleteAuth(auth);
     }
 }
