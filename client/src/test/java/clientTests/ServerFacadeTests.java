@@ -1,7 +1,9 @@
 package clientTests;
 
+import dataAccess.SQLGameDAO;
 import dataAccess.SQLUserDAO;
 import model.AuthData;
+import model.Game;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -109,6 +111,53 @@ public class ServerFacadeTests {
         //Bad Request
         exception = assertThrows(Exception.class, () -> {ServerFacade.create(URL, auth.authToken(),"newgame");});
         Assertions.assertTrue(exception.getMessage().contains("400"),"Server did not throw 400 exception.");
+
+    }
+
+    @Test
+    @DisplayName("List")
+    public void list() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ArrayList<Game> list = new ArrayList<>();
+        for(int i = 1; i < 5; i++) {
+            ServerFacade.create(URL, auth.authToken(), "newgame"+i);
+            list.add(new Game(i,null,null,"newgame"+i));
+        }
+        Assertions.assertEquals(list, ServerFacade.list(URL,auth.authToken()).games(), "List did not return the correct list.");
+
+        //Negative cases
+        //Unauthorized
+        Exception exception = assertThrows(Exception.class, () -> {ServerFacade.list(URL,"BADAUTHNOPEDONTDOIT");});
+        Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+
+    }
+
+    @Test
+    @DisplayName("Join")
+    public void join() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ServerFacade.create(URL,auth.authToken(),"newgame");
+        ServerFacade.join(URL,auth.authToken(),1,"WHITE");
+        Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).whiteUsername(), "game.whiteUsername was incorrect");
+        ServerFacade.join(URL,auth.authToken(),1,"BLACK");
+        Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).blackUsername(), "game.blackUsername was incorrect");
+
+
+        //Negative cases
+            //Setup
+            ServerFacade.create(URL,auth.authToken(),"FailTestGame");
+            ServerFacade.join(URL,auth.authToken(),2,"WHITE");
+        //Unauthorized
+        Exception exception = assertThrows(Exception.class, () -> {ServerFacade.join(URL,"BADAUTHNOPEDONTDOIT",2,"WHITE");});
+        Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
+        //Bad Request
+        exception = assertThrows(Exception.class, () -> {ServerFacade.join(URL, auth.authToken(),100,"WHITE");});
+        Assertions.assertTrue(exception.getMessage().contains("400"),"Server did not throw 400 exception.");
+        //Already Taken
+        exception = assertThrows(Exception.class, () -> {ServerFacade.join(URL, auth.authToken(),2,"WHITE");});
+        Assertions.assertTrue(exception.getMessage().contains("403"),"Server did not throw 403 exception.");
 
     }
 
