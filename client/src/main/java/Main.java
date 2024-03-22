@@ -109,6 +109,8 @@ public class Main {
                         } else if (readEqual(action, "Observe")) {
                             ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
                             System.out.printf("Now observing game #%s.\n",command[1]);
+                            System.out.println("Loading game:");
+                            setting = "ingame";
 
                         } else if (readEqual(action, "Quit")) {
                             ServerFacade.logout(serverUrl,authData.authToken());
