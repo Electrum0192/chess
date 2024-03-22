@@ -55,7 +55,6 @@ public class UserService {
         }
         BCryptPasswordEncoder coder = new BCryptPasswordEncoder();
         if(!coder.matches(user.password(), dataAccess.getUser(user.username()).password())){
-            System.out.println("FLAG");
             throw new Exception("Error: unauthorized");
         }
         //Get new AuthData for user
