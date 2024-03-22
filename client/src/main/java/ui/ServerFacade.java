@@ -135,6 +135,18 @@ public class ServerFacade {
             throw new Exception(response.message());
         }
     }
+    public static void clear(String url) throws Exception{
+        URI uri = new URI(url + "/db");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+
+        http.setRequestMethod("DELETE");
+        http.connect();
+
+        if(http.getResponseCode() != 200){
+            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(response.message());
+        }
+    }
 
     private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
         if (!body.isEmpty()) {

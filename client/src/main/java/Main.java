@@ -71,14 +71,8 @@ public class Main {
 
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
-                                URI uri = new URI(serverUrl + "/db");
-                                HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-
-                                http.setRequestMethod("DELETE");
-                                http.connect();
-                                if(http.getResponseCode() == 200){
-                                    System.out.println("Database cleared");
-                                }else{System.out.println("Error");}
+                                ServerFacade.clear(serverUrl);
+                                System.out.println("Database cleared");
                             }
                         } else {
                             throw new Exception("Unknown Command");
@@ -122,14 +116,9 @@ public class Main {
                             run = false;
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
-                                URI uri = new URI(serverUrl + "/db");
-                                HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+                                ServerFacade.clear(serverUrl);
+                                System.out.println("Database cleared");
 
-                                http.setRequestMethod("DELETE");
-                                http.connect();
-                                if(http.getResponseCode() == 200){
-                                    System.out.println("Database cleared");
-                                }else{System.out.println("Error");}
                             }
                         } else {
                             throw new Exception("Unknown Command");
