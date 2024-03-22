@@ -53,6 +53,14 @@ public class ServerFacadeTests {
         //Positive case
         ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
         Assertions.assertNotNull(new SQLUserDAO().getUser("Steve"),"User was not successfully created.");
+    }
+
+    @Test
+    @DisplayName("Register Error Checks")
+    public void registerErrors() throws Exception {
+        //Positive case
+        ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        Assertions.assertNotNull(new SQLUserDAO().getUser("Steve"),"User was not successfully created.");
 
         //Negative cases
         //Bad Request
@@ -66,6 +74,15 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Login")
     public void login() throws Exception {
+        //Positive case
+        ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        AuthData auth = ServerFacade.login(URL, new UserData("Steve", "incorrect", null));
+        Assertions.assertNotNull(auth,"User was not successfully logged in.");
+    }
+
+    @Test
+    @DisplayName("Login Error Checks")
+    public void loginErrors() throws Exception {
         //Positive case
         ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
         AuthData auth = ServerFacade.login(URL, new UserData("Steve", "incorrect", null));
@@ -88,6 +105,15 @@ public class ServerFacadeTests {
         AuthData auth = ServerFacade.login(URL, new UserData("Steve", "incorrect", null));
         ServerFacade.logout(URL,auth.authToken());
         Assertions.assertEquals(2, getDatabaseRows(), "User was not successfully logged out.");
+    }
+    @Test
+    @DisplayName("Logout Error Checks")
+    public void logoutErrors() throws Exception {
+        //Positive case
+        ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        AuthData auth = ServerFacade.login(URL, new UserData("Steve", "incorrect", null));
+        ServerFacade.logout(URL,auth.authToken());
+        Assertions.assertEquals(2, getDatabaseRows(), "User was not successfully logged out.");
 
         //Negative cases
         //Unauthorized
@@ -103,6 +129,14 @@ public class ServerFacadeTests {
         AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
         ServerFacade.create(URL,auth.authToken(),"newgame");
         Assertions.assertEquals(3, getDatabaseRows(), "Game was not successfully created");
+    }
+    @Test
+    @DisplayName("Create Error Checks")
+    public void createErrors() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ServerFacade.create(URL,auth.authToken(),"newgame");
+        Assertions.assertEquals(3, getDatabaseRows(), "Game was not successfully created");
 
         //Negative cases
         //Unauthorized
@@ -113,10 +147,21 @@ public class ServerFacadeTests {
         Assertions.assertTrue(exception.getMessage().contains("400"),"Server did not throw 400 exception.");
 
     }
-
     @Test
     @DisplayName("List")
     public void list() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ArrayList<Game> list = new ArrayList<>();
+        for(int i = 1; i < 5; i++) {
+            ServerFacade.create(URL, auth.authToken(), "newgame"+i);
+            list.add(new Game(i,null,null,"newgame"+i));
+        }
+        Assertions.assertEquals(list, ServerFacade.list(URL,auth.authToken()).games(), "List did not return the correct list.");
+    }
+    @Test
+    @DisplayName("List Error Checks")
+    public void listErrors() throws Exception {
         //Positive case
         AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
         ArrayList<Game> list = new ArrayList<>();
@@ -132,7 +177,6 @@ public class ServerFacadeTests {
         Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
 
     }
-
     @Test
     @DisplayName("Join")
     public void join() throws Exception {
@@ -143,12 +187,24 @@ public class ServerFacadeTests {
         Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).whiteUsername(), "game.whiteUsername was incorrect");
         ServerFacade.join(URL,auth.authToken(),1,"BLACK");
         Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).blackUsername(), "game.blackUsername was incorrect");
+    }
+
+    @Test
+    @DisplayName("Join Error Check")
+    public void joinErrors() throws Exception {
+        //Positive case
+        AuthData auth = ServerFacade.register(URL, new UserData("Steve","incorrect","email"));
+        ServerFacade.create(URL,auth.authToken(),"newgame");
+        ServerFacade.join(URL,auth.authToken(),1,"WHITE");
+        Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).whiteUsername(), "game.whiteUsername was incorrect");
+        ServerFacade.join(URL,auth.authToken(),1,"BLACK");
+        Assertions.assertEquals("Steve", new SQLGameDAO().getGame(1).blackUsername(), "game.blackUsername was incorrect");
 
 
         //Negative cases
-            //Setup
-            ServerFacade.create(URL,auth.authToken(),"FailTestGame");
-            ServerFacade.join(URL,auth.authToken(),2,"WHITE");
+        //Setup
+        ServerFacade.create(URL,auth.authToken(),"FailTestGame");
+        ServerFacade.join(URL,auth.authToken(),2,"WHITE");
         //Unauthorized
         Exception exception = assertThrows(Exception.class, () -> {ServerFacade.join(URL,"BADAUTHNOPEDONTDOIT",2,"WHITE");});
         Assertions.assertTrue(exception.getMessage().contains("401"),"Server did not throw 401 exception.");
@@ -160,7 +216,6 @@ public class ServerFacadeTests {
         Assertions.assertTrue(exception.getMessage().contains("403"),"Server did not throw 403 exception.");
 
     }
-
     private int getDatabaseRows() {
         int rows = 0;
         try {
