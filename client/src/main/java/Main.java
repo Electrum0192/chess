@@ -33,17 +33,20 @@ public class Main {
 
     private static void runClient(String serverUrl) throws Exception{
         AuthData authData = new AuthData("Null", "Null");
+        String team = null;
 
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
 
         //Loop for user input/client output
-        Boolean run = true;
+        boolean run = true;
         String setting = "LOGGED_OUT";
         while(run){
             //if(authData != null){System.out.println(authData.toString());} //For Debugging
             //Get user input
-            if(!setting.equals("ingame")){System.out.printf("[%s] >>> ",setting);}
+            if(!setting.equals("ingame")){
+                System.out.printf("[%s] >>> ",setting);
+            }else{System.out.printf("[%s] >>> ",team);}
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             var command = line.split(" ");
@@ -100,6 +103,7 @@ public class Main {
                                 System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
                                 System.out.println("Loading game:");
                                 setting = "ingame";
+                                team = command[2].toUpperCase();
                             }else{
                                 //requestColor = empty aka null
                                 ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
@@ -111,6 +115,7 @@ public class Main {
                             System.out.printf("Now observing game #%s.\n",command[1]);
                             System.out.println("Loading game:");
                             setting = "ingame";
+                            team = "OBSERVER";
 
                         } else if (readEqual(action, "Quit")) {
                             ServerFacade.logout(serverUrl,authData.authToken());
@@ -131,12 +136,27 @@ public class Main {
                             ServerFacade.logout(serverUrl,authData.authToken());
                             System.out.println("Goodbye");
                             run = false;
+                        } else if (readEqual(action, "Help")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Draw")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Leave")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Move")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Resign")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action, "Show")) {
+                            System.out.println(helpText(setting));
+                        } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
+                            if(command[1].equals("wotsirb123")) {
+                                ServerFacade.clear(serverUrl);
+                                System.out.println("Database cleared");
+
+                            }
+                        } else {
+                            throw new Exception("Unknown Command");
                         }
-                        //FILLER BOARD FOR PROJECT 5
-                        ChessBoard board = new ChessBoard();
-                        board.resetBoard();
-                        printBoard(board);
-                        //Gameplay code here
                         break;
                 }
             }catch (Exception e){
@@ -494,6 +514,39 @@ public class Main {
             builder.append("  quit");
             builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
             builder.append(" - to exit\n");
+
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  help");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to display these command options\n\n");
+
+            return builder.toString();
+        } else if (setting.equals("ingame")) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  draw");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to redraw the chessboard\n");
+
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  leave");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to exit the game and go back to the menu\n");
+
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  move <Position> <Position>");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to move a piece from the first position to the second. Example: move D2 D4\n");
+
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  Resign");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to declare the other player as the winner and end the game\n");
+
+            builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+            builder.append("  Show <Position>");
+            builder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+            builder.append(" - to show the legal moves the piece at that position can make\n");
 
             builder.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
             builder.append("  help");
