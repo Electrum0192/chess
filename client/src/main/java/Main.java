@@ -141,7 +141,9 @@ public class Main {
                         } else if (readEqual(action, "Draw")) {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Leave")) {
-                            System.out.println(helpText(setting));
+                            System.out.println("Exiting Game");
+                            setting = "LOGGED_IN";
+                            team = null;
                         } else if (readEqual(action, "Move")) {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Resign")) {
