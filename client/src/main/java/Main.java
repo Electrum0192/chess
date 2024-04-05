@@ -1,11 +1,9 @@
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import model.*;
 import ui.EscapeSequences;
 import ui.ServerFacade;
+import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +31,10 @@ public class Main {
     private static void runClient(String serverUrl) throws Exception{
         AuthData authData = new AuthData("Null", "Null");
         String team = null;
+        int ID = 0;
 
         ServerFacade facade = new ServerFacade();
         facade.connect(serverUrl);
-        String message = null;
 
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
@@ -46,11 +44,7 @@ public class Main {
         String setting = "LOGGED_OUT";
         while(run){
 
-            //Send next message to server, if applicable
-            if(message != null){
-                facade.send(message);
-                message = null;
-            }
+
 
             //if(authData != null){System.out.println(authData.toString());} //For Debugging
             //Get user input
@@ -109,21 +103,30 @@ public class Main {
 
                         } else if (readEqual(action, "Join")) {
                             if(command.length==3) {
-                                ServerFacade.join(serverUrl, authData.authToken(), Integer.parseInt(command[1]), command[2]);
+                                var joinPlayer = ServerFacade.join(serverUrl, authData.authToken(), Integer.parseInt(command[1]), command[2]);
+                                facade.send(new Gson().toJson(joinPlayer));
                                 System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
                                 System.out.println("Loading game:");
+                                ID = Integer.parseInt(command[1]);
                                 setting = "ingame";
                                 team = command[2].toUpperCase();
                             }else{
                                 //requestColor = empty aka null
-                                ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                                var joinObserver = ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                                facade.send(new Gson().toJson(joinObserver));
                                 System.out.printf("Now observing game #%s.\n",command[1]);
+                                System.out.println("Loading game:");
+                                ID = Integer.parseInt(command[1]);
+                                setting = "ingame";
+                                team = "OBSERVER";
                             }
 
                         } else if (readEqual(action, "Observe")) {
-                            ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                            var joinObserver = ServerFacade.join(serverUrl,authData.authToken(),Integer.parseInt(command[1]),"null");
+                            facade.send(new Gson().toJson(joinObserver));
                             System.out.printf("Now observing game #%s.\n",command[1]);
                             System.out.println("Loading game:");
+                            ID = Integer.parseInt(command[1]);
                             setting = "ingame";
                             team = "OBSERVER";
 
@@ -142,25 +145,29 @@ public class Main {
                         }
                         break;
                     case "ingame":
-                        if(readEqual(action, "Quit")){
-                            ServerFacade.logout(serverUrl,authData.authToken());
-                            System.out.println("Goodbye");
-                            run = false;
-                        } else if (readEqual(action, "Help")) {
+                        if (readEqual(action, "Help")) {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Draw")) {
-                            System.out.println(helpText(setting));
+                            if(team.equals("BLACK")){
+                                printBlack(facade.getGame().getBoard());
+                            }else{printWhite(facade.getGame().getBoard());}
                         } else if (readEqual(action, "Leave")) {
-                            //TODO Remove username from game database
-                            System.out.println("Exiting Game");
+                            Leave leave = new Leave(authData.authToken(),ID);
+                            facade.send(new Gson().toJson(leave));
                             setting = "LOGGED_IN";
                             team = null;
                         } else if (readEqual(action, "Move")) {
-                            System.out.println(helpText(setting));
+                            //TODO: parse move from commands
+                            MakeMove move = new MakeMove(authData.authToken(),ID,new ChessMove(null,null));
+                            facade.send(new Gson().toJson(move));
                         } else if (readEqual(action, "Resign")) {
-                            System.out.println(helpText(setting));
+                            //TODO: Are you sure?
+                            Resign resign = new Resign(authData.authToken(),ID);
+                            facade.send(new Gson().toJson(resign));
                         } else if (readEqual(action, "Show")) {
-                            System.out.println(helpText(setting));
+                            //TODO: parse position from commands
+                            Collection<ChessMove> moves = facade.getGame().validMoves(null);
+                            //TODO: change printBoard to show those spaces differently
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
                                 ServerFacade.clear(serverUrl);
@@ -168,8 +175,7 @@ public class Main {
 
                             }
                         } else {
-                            //throw new Exception("Unknown Command");
-                            message = action;
+                            throw new Exception("Unknown Command");
                         }
                         break;
                 }

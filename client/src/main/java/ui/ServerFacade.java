@@ -1,7 +1,11 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
+import webSocketMessages.userCommands.JoinObserver;
+import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.UserGameCommand;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
@@ -17,6 +21,7 @@ import java.net.URISyntaxException;
 public class ServerFacade extends Endpoint{
 
     public Session session;
+    private ChessGame game;
 
     public static AuthData register(String url, UserData user) throws Exception{
         URI uri = new URI(url + "/user");
@@ -123,7 +128,7 @@ public class ServerFacade extends Endpoint{
             throw new Exception(response.message());
         }
     }
-    public static void join(String url, String authToken, int gameID, String requestColor) throws Exception{
+    public static UserGameCommand join(String url, String authToken, int gameID, String requestColor) throws Exception{
         URI uri = new URI(url + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
 
@@ -145,6 +150,17 @@ public class ServerFacade extends Endpoint{
         if(http.getResponseCode() != 200){
             ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
             throw new Exception(response.message());
+        }
+
+        ChessGame.TeamColor team;
+        if(requestColor.toUpperCase().equals("WHITE")){
+            team = ChessGame.TeamColor.WHITE;
+            return new JoinPlayer(authToken, gameID, team);
+        }else if(requestColor.toUpperCase().equals("BLACK")){
+            team = ChessGame.TeamColor.BLACK;
+            return new JoinPlayer(authToken, gameID, team);
+        }else {
+            return new JoinObserver(authToken, gameID);
         }
     }
     public static void clear(String url) throws Exception{
@@ -200,5 +216,9 @@ public class ServerFacade extends Endpoint{
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
 
+    }
+
+    public ChessGame getGame() {
+        return game;
     }
 }
