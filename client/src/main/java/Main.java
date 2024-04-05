@@ -152,14 +152,23 @@ public class Main {
                             facade.send(new Gson().toJson(leave));
                             setting = "LOGGED_IN";
                             team = null;
+                            ID = 0;
                         } else if (readEqual(action, "Move")) {
                             ChessMove newMove = new ChessMove(parsePos(command[1]),parsePos(command[2]));
                             MakeMove move = new MakeMove(authData.authToken(),ID,newMove);
                             facade.send(new Gson().toJson(move));
                         } else if (readEqual(action, "Resign")) {
-                            //TODO: Are you sure?
-                            Resign resign = new Resign(authData.authToken(),ID);
-                            facade.send(new Gson().toJson(resign));
+                            System.out.println("Please confirm that you would like to concede the game (Y/N):");
+                            String confirm = scanner.nextLine();
+                            if(readEqual(confirm,"Y") || readEqual(confirm, "Yes")) {
+                                Resign resign = new Resign(authData.authToken(), ID);
+                                facade.send(new Gson().toJson(resign));
+                                setting = "LOGGED_IN";
+                                team = null;
+                                ID = 0;
+                            }else{
+                                System.out.println("Resignation cancelled");
+                            }
                         } else if (readEqual(action, "Show")) {
                             Collection<ChessMove> moves = facade.getGame().validMoves(parsePos(command[1]));
                             //TODO: change printBoard to show those spaces differently
