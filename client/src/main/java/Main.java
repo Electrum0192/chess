@@ -5,10 +5,6 @@ import ui.EscapeSequences;
 import ui.ServerFacade;
 import webSocketMessages.userCommands.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -157,16 +153,15 @@ public class Main {
                             setting = "LOGGED_IN";
                             team = null;
                         } else if (readEqual(action, "Move")) {
-                            //TODO: parse move from commands
-                            MakeMove move = new MakeMove(authData.authToken(),ID,new ChessMove(null,null));
+                            ChessMove newMove = new ChessMove(parsePos(command[1]),parsePos(command[2]));
+                            MakeMove move = new MakeMove(authData.authToken(),ID,newMove);
                             facade.send(new Gson().toJson(move));
                         } else if (readEqual(action, "Resign")) {
                             //TODO: Are you sure?
                             Resign resign = new Resign(authData.authToken(),ID);
                             facade.send(new Gson().toJson(resign));
                         } else if (readEqual(action, "Show")) {
-                            //TODO: parse position from commands
-                            Collection<ChessMove> moves = facade.getGame().validMoves(null);
+                            Collection<ChessMove> moves = facade.getGame().validMoves(parsePos(command[1]));
                             //TODO: change printBoard to show those spaces differently
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
@@ -460,22 +455,28 @@ public class Main {
         return low.equals(testLow);
     }
 
-    private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
-        if (!body.isEmpty()) {
-            http.setDoOutput(true);
-            try (var outputStream = http.getOutputStream()) {
-                outputStream.write(body.getBytes());
-            }
+    private static ChessPosition parsePos(String in) throws Exception {
+        if(in.length() != 2){
+            throw new Exception("Invalid coordinate");
         }
-    }
+        in = in.toUpperCase();
 
-    private static <T> T readResponseBody(HttpURLConnection http, Class<T> c) throws IOException {
-        T responseBody;
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = (T) new Gson().fromJson(inputStreamReader, c);
-            return responseBody;
+        int row = Integer.parseInt(in.substring(1));
+        int column = 0;
+        switch (in.charAt(0)) {
+            case 'A' -> column = 1;
+            case 'B' -> column = 2;
+            case 'C' -> column = 3;
+            case 'D' -> column = 4;
+            case 'E' -> column = 5;
+            case 'F' -> column = 6;
+            case 'G' -> column = 7;
+            case 'H' -> column = 8;
         }
+        if(column == 0){
+            throw new Exception("Invalid coordinate");
+        }
+        return new ChessPosition(row, column);
     }
 
     private static String helpText(String setting){
