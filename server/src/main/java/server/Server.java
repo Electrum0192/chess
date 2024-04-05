@@ -4,7 +4,12 @@ import dataAccess.DataAccessException;
 import dataAccess.DatabaseManager;
 import spark.*;
 
+import java.util.HashSet;
+import java.util.Map;
+
 public class Server {
+
+    public Map<Integer, HashSet<Session>> users;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -25,7 +30,6 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game",this::joinGame);
-        //Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
         Spark.awaitInitialization();
         return Spark.port();
