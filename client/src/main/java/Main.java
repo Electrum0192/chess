@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -35,6 +34,10 @@ public class Main {
         AuthData authData = new AuthData("Null", "Null");
         String team = null;
 
+        ServerFacade facade = new ServerFacade();
+        facade.connect(serverUrl);
+        String message = null;
+
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
 
@@ -42,6 +45,13 @@ public class Main {
         boolean run = true;
         String setting = "LOGGED_OUT";
         while(run){
+
+            //Send next message to server, if applicable
+            if(message != null){
+                facade.send(message);
+                message = null;
+            }
+
             //if(authData != null){System.out.println(authData.toString());} //For Debugging
             //Get user input
             if(!setting.equals("ingame")){
@@ -141,6 +151,7 @@ public class Main {
                         } else if (readEqual(action, "Draw")) {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Leave")) {
+                            //TODO Remove username from game database
                             System.out.println("Exiting Game");
                             setting = "LOGGED_IN";
                             team = null;
@@ -157,7 +168,8 @@ public class Main {
 
                             }
                         } else {
-                            throw new Exception("Unknown Command");
+                            //throw new Exception("Unknown Command");
+                            message = action;
                         }
                         break;
                 }

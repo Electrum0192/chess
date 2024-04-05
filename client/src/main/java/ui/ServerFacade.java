@@ -3,6 +3,10 @@ package ui;
 import com.google.gson.Gson;
 import model.*;
 
+import javax.websocket.ContainerProvider;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,7 +14,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class ServerFacade {
+public class ServerFacade extends Endpoint{
+
+    public Session session;
 
     public static AuthData register(String url, UserData user) throws Exception{
         URI uri = new URI(url + "/user");
@@ -154,6 +160,25 @@ public class ServerFacade {
         }
     }
 
+    public void connect(String url) throws Exception{
+        //Convert URL from http to ws
+        url = url.replaceFirst("http","ws");
+        //Connect
+        URI uri = new URI(url + "/connect");
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        this.session = container.connectToServer(this, uri);
+
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String message) {
+                System.out.println(message);
+            }
+        });
+    }
+
+    public void send(String msg) throws Exception{
+        this.session.getBasicRemote().sendText(msg);
+    }
+
     private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
         if (!body.isEmpty()) {
             http.setDoOutput(true);
@@ -170,5 +195,10 @@ public class ServerFacade {
             responseBody = (T) new Gson().fromJson(inputStreamReader, c);
             return responseBody;
         }
+    }
+
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+
     }
 }

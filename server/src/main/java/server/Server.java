@@ -14,6 +14,9 @@ public class Server {
         DatabaseManager.initialize();
         //DatabaseManager.updateMemory();
 
+        //Websocket Endpoint
+        Spark.webSocket("/connect", WSHandler.class);
+
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearApp);
         Spark.post("/user", this::register);
@@ -22,6 +25,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game",this::joinGame);
+        //Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -49,4 +53,5 @@ public class Server {
         return GameHandler.createGame(req,res);
     }
     private Object joinGame(Request req, Response res){return GameHandler.joinGame(req,res);}
+
 }
