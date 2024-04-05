@@ -192,7 +192,13 @@ public class ServerFacade extends Endpoint{
                 try{
                     var response = new Gson().fromJson(message, ServerMessage.class);
                     if(response.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)){
-                        //TODO: LOAD GAME
+                        LoadGame loadGame = (LoadGame) response;
+                        game = loadGame.load();
+                        if(Client.getTeam().equals("BLACK")){
+                            BoardPrinter.printBlack(game.getBoard());
+                        }else{
+                            BoardPrinter.printBoard(game.getBoard());
+                        }
                     }else if(response.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
                         Error error = (Error) response;
                         System.out.println("Error: "+error.getErrorMessage());
