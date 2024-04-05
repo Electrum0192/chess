@@ -3,6 +3,8 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
+import webSocketMessages.serverMessages.*;
+import webSocketMessages.serverMessages.Error;
 import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
 import webSocketMessages.userCommands.UserGameCommand;
@@ -186,7 +188,21 @@ public class ServerFacade extends Endpoint{
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
-                System.out.println(message);
+                //Decode message to ServerMessage
+                try{
+                    var response = new Gson().fromJson(message, ServerMessage.class);
+                    if(response.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)){
+                        //TODO: LOAD GAME
+                    }else if(response.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+                        Error error = (Error) response;
+                        System.out.println("Error: "+error.getErrorMessage());
+                    }else if(response.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)){
+                        Notification notification = (Notification) response;
+                        System.out.println(notification.getMessage());
+                    }
+                }catch (Exception e){
+                    System.out.println(message);
+                }
             }
         });
     }
