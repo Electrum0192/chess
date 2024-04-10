@@ -1,15 +1,16 @@
 package server;
 
-import dataAccess.DataAccessException;
 import dataAccess.DatabaseManager;
+import org.eclipse.jetty.websocket.api.Session;
 import spark.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 public class Server {
 
-    public Map<Integer, HashSet<Session>> users;
+    private static Map<Integer, HashSet<Session>> users;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -21,6 +22,7 @@ public class Server {
 
         //Websocket Endpoint
         Spark.webSocket("/connect", WSHandler.class);
+        users = new HashMap<>();
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearApp);
@@ -57,5 +59,19 @@ public class Server {
         return GameHandler.createGame(req,res);
     }
     private Object joinGame(Request req, Response res){return GameHandler.joinGame(req,res);}
+
+    public static void addPlayer(int gameID, Session user){
+        if(users.containsKey(gameID)){
+            users.get(gameID).add(user);
+        }else {
+            HashSet<Session> sessions = new HashSet<>();
+            sessions.add(user);
+            users.put(gameID, sessions);
+        }
+    }
+
+    public static HashSet<Session> getSessions(int gameID){
+        return users.get(gameID);
+    }
 
 }

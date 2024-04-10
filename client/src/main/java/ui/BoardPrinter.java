@@ -124,7 +124,7 @@ public class BoardPrinter {
 
     public static void printWhite(ChessBoard board){
         //Backwards
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE+EscapeSequences.SET_BG_COLOR_BLACK);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE+EscapeSequences.SET_BG_COLOR_BLACK);
         System.out.println("\u2002 \u2002\u2002A\u2002\u2004\u2004\u2002B\u2002\u2004\u2004\u2002C\u2002\u2004\u2004\u2002D\u2002\u2004\u2004\u2002E\u2002\u2004\u2004\u2002F\u2002\u2004\u2004\u2002G\u2002\u2004\u2004\u2002H");
         for(int r = 8; r >= 1; r--){
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE+EscapeSequences.SET_BG_COLOR_BLACK);

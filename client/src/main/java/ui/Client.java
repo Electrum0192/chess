@@ -104,7 +104,6 @@ public class Client {
                             if(command.length==3) {
                                 var joinPlayer = ServerFacade.join(serverUrl, authData.authToken(), Integer.parseInt(command[1]), command[2]);
                                 facade.send(new Gson().toJson(joinPlayer));
-                                System.out.println("Successfully joined game " + command[1] + " as " + command[2]);
                                 System.out.println("Loading game:");
                                 ID = Integer.parseInt(command[1]);
                                 setting = "ingame";
