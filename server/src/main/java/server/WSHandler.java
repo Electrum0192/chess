@@ -13,6 +13,7 @@ import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.Leave;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
@@ -55,7 +56,28 @@ public class WSHandler {
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)) {
             session.getRemote().sendString("TODO: MOVE");
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.LEAVE)) {
-            session.getRemote().sendString("TODO: LEAVE");
+            //Remove player from group for that game
+            Leave leave = new Gson().fromJson(message, Leave.class);
+            Server.removePlayer(leave.getGameID(),session);
+            //Remove player from game list for that game, if applicable
+            String username = new SQLAuthDAO().getAuth(leave.getAuthString()).username();
+            ChessGame.TeamColor team = null;
+            SQLGameDAO gameDAO = new SQLGameDAO();
+            if(gameDAO.getGame(leave.getGameID()).whiteUsername() != null){
+                if(gameDAO.getGame(leave.getGameID()).whiteUsername().equals(username)){
+                    team = ChessGame.TeamColor.WHITE;
+                }
+            }else if(gameDAO.getGame(leave.getGameID()).blackUsername().equals(username)) {
+                if(gameDAO.getGame(leave.getGameID()).blackUsername().equals(username)) {
+                    team = ChessGame.TeamColor.BLACK;
+                }
+            }
+            if(team != null) {
+                gameDAO.updatePlayers(leave.getGameID(),team,null);
+            }
+            //Notify the other players
+            String notif = username+" has left the game";
+            messageAll(leave.getGameID(), new Notification(notif));
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.RESIGN)) {
             session.getRemote().sendString("TODO: RESIGN");
         }

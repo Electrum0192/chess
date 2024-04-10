@@ -69,7 +69,12 @@ public class Server {
             users.put(gameID, sessions);
         }
     }
-
+    public static void removePlayer(int gameID, Session user){
+        users.get(gameID).remove(user);
+        if(users.get(gameID).isEmpty()){
+            users.remove(gameID);
+        }
+    }
     public static HashSet<Session> getSessions(int gameID){
         return users.get(gameID);
     }

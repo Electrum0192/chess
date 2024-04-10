@@ -246,7 +246,7 @@ public class ServerFacade extends Endpoint{
             case 401 ->
                     "Error: Server returned 401 (Unauthorized). Double check your credentials or try a different command.";
             case 403 ->
-                    "Error: Server returned 403 (Already Taken). Make sure you aren't trying to create something that already exists.";
+                    "Error: Server returned 403 (Already Taken). Make sure you aren't trying to create something that already exists, or join a team that is full.";
             case 500 ->
                     "Error: Server returned 500 (Unknown Error). Congratulations on breaking something that wasn't meant to be broken.";
             default -> "";
