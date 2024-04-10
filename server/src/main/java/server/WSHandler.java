@@ -11,6 +11,7 @@ import service.UserService;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -41,7 +42,16 @@ public class WSHandler {
             }
             messageAll(joinPlayer.getGameID(), new Notification(notif));
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.JOIN_OBSERVER)) {
-            session.getRemote().sendString("TODO: OBSERVE");
+            //Add session to group for that game
+            JoinObserver joinObserver = new Gson().fromJson(message, JoinObserver.class);
+            Server.addPlayer(joinObserver.getGameID(),session);
+            //Send LoadGame to user
+            ChessGame game = new SQLGameDAO().getGame(joinObserver.getGameID()).game();
+            session.getRemote().sendString(new Gson().toJson(new LoadGame(game)));
+            //Send Message to all users that player has joined the game
+            String username = new SQLAuthDAO().getAuth(joinObserver.getAuthString()).username();
+            String notif = username+" has joined the game as an observer";
+            messageAll(joinObserver.getGameID(), new Notification(notif));
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)) {
             session.getRemote().sendString("TODO: MOVE");
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.LEAVE)) {

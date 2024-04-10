@@ -207,7 +207,6 @@ public class ServerFacade extends Endpoint{
                         System.out.println("<SERVER>: "+notification.getMessage());
                     }
                 }catch (Exception e){
-                    System.out.println("FLAG");
                     System.out.println(message);
                 }
             }
