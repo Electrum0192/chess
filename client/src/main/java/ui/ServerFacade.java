@@ -45,8 +45,8 @@ public class ServerFacade extends Endpoint{
         if(http.getResponseCode() == 200){
             return (AuthData) readResponseBody(http, AuthData.class);
         }else{
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
     }
     public static AuthData login(String url, UserData user) throws Exception {
@@ -67,8 +67,8 @@ public class ServerFacade extends Endpoint{
         if(http.getResponseCode() == 200){
             return (AuthData) readResponseBody(http, AuthData.class);
         }else{
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
     }
     public static boolean logout(String url, String authToken) throws Exception{
@@ -84,8 +84,8 @@ public class ServerFacade extends Endpoint{
         if(http.getResponseCode() == 200){
             return true;
         }else{
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
 
     }
@@ -109,8 +109,8 @@ public class ServerFacade extends Endpoint{
             GameID ID = (GameID) readResponseBody(http, GameID.class);
             return ID.gameID();
         }else{
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
     }
     public static GameList list(String url, String authToken) throws Exception{
@@ -126,8 +126,8 @@ public class ServerFacade extends Endpoint{
         if(http.getResponseCode() == 200){
             return (GameList) readResponseBody(http, GameList.class);
         }else{
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
     }
     public static UserGameCommand join(String url, String authToken, int gameID, String requestColor) throws Exception{
@@ -150,8 +150,8 @@ public class ServerFacade extends Endpoint{
         http.connect();
 
         if(http.getResponseCode() != 200){
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
 
         ChessGame.TeamColor team;
@@ -173,8 +173,8 @@ public class ServerFacade extends Endpoint{
         http.connect();
 
         if(http.getResponseCode() != 200){
-            ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
-            throw new Exception(response.message());
+            //ErrorMessage response = (ErrorMessage) readResponseBody(http, ErrorMessage.class);
+            throw new Exception(http.getResponseCode()+"");
         }
     }
 
@@ -207,6 +207,7 @@ public class ServerFacade extends Endpoint{
                         System.out.println("<SERVER>: "+notification.getMessage());
                     }
                 }catch (Exception e){
+                    System.out.println("FLAG");
                     System.out.println(message);
                 }
             }
@@ -238,6 +239,20 @@ public class ServerFacade extends Endpoint{
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
 
+    }
+
+    public static void readError(int errorCode){
+        String display = switch (errorCode) {
+            case 400 -> "Error: Server returned 400 (Bad Request). Double check your input parameters.";
+            case 401 ->
+                    "Error: Server returned 401 (Unauthorized). Double check your credentials or try a different command.";
+            case 403 ->
+                    "Error: Server returned 403 (Already Taken). Make sure you aren't trying to create something that already exists.";
+            case 500 ->
+                    "Error: Server returned 500 (Unknown Error). Congratulations on breaking something that wasn't meant to be broken.";
+            default -> "";
+        };
+        System.out.println(display);
     }
 
     public ChessGame getGame() {

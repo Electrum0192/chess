@@ -186,7 +186,11 @@ public class Client {
                         break;
                 }
             }catch (Exception e){
-                System.out.println(e.getMessage());
+                try{
+                    ServerFacade.readError(Integer.parseInt(e.getMessage()));
+                }catch (Exception e2){
+                    System.out.println(e.getMessage());
+                }
             }
         }
 
