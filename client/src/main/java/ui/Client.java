@@ -12,6 +12,7 @@ import webSocketMessages.userCommands.MakeMove;
 import webSocketMessages.userCommands.Resign;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class Client {
@@ -147,8 +148,8 @@ public class Client {
                             System.out.println(helpText(setting));
                         } else if (readEqual(action, "Draw")) {
                             if(team.equals("BLACK")){
-                                BoardPrinter.printBlack(facade.getGame().getBoard());
-                            }else{BoardPrinter.printWhite(facade.getGame().getBoard());}
+                                BoardPrinter.printBlack(facade.getGame().getBoard(), null);
+                            }else{BoardPrinter.printWhite(facade.getGame().getBoard(), null);}
                         } else if (readEqual(action, "Leave")) {
                             Leave leave = new Leave(authData.authToken(),ID);
                             facade.send(new Gson().toJson(leave));
@@ -173,7 +174,11 @@ public class Client {
                             }
                         } else if (readEqual(action, "Show")) {
                             Collection<ChessMove> moves = facade.getGame().validMoves(parsePos(command[1]));
-                            //TODO: change printBoard to show those spaces differently
+                            if(team.equals("BLACK")){
+                                BoardPrinter.printBlack(facade.getGame().getBoard(), (HashSet<ChessMove>) moves);
+                            }else{
+                                BoardPrinter.printWhite(facade.getGame().getBoard(), (HashSet<ChessMove>) moves);
+                            }
                         } else if (readEqual(action,"Clear")) { //Secret, password protected method for clearing the Database
                             if(command[1].equals("wotsirb123")) {
                                 ServerFacade.clear(serverUrl);
