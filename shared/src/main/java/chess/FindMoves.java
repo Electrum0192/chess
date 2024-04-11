@@ -19,6 +19,8 @@ public class FindMoves {
     }
     private Collection<ChessMove> moves;
 
+    Collection<ChessMove> returnMoves(){return moves;}
+
     void recurseMove(ChessBoard board, ChessPosition myPosition, ChessPosition curPosition, int up, int right, ChessGame.TeamColor enemy){
         ChessPosition target = new ChessPosition(curPosition.getRow()+up,curPosition.getColumn()+right);
         boolean repeat = checkMove(board,myPosition,target,enemy);

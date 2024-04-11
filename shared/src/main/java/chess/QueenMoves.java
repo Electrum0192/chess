@@ -1,13 +1,8 @@
 package chess;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 public class QueenMoves extends FindMoves {
-    public QueenMoves() {
-        this.moves = new HashSet<ChessMove>();
-    }
-
     @Override
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition myPosition) {
         //Determine Color
@@ -28,7 +23,7 @@ public class QueenMoves extends FindMoves {
         recurseMove(board,myPosition,myPosition,-1,1,enemy);
         recurseMove(board,myPosition,myPosition,-1,-1,enemy);
 
-        return moves;
+        return this.returnMoves();
     }
 
     Collection<ChessMove> moves;

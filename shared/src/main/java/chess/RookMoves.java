@@ -24,7 +24,7 @@ public class RookMoves extends FindMoves {
         recurseMove(board,myPosition,myPosition,-1,0,enemy);
         recurseMove(board,myPosition,myPosition,0,-1,enemy);
 
-        return moves;
+        return this.returnMoves();
     }
 
 

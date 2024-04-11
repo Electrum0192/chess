@@ -24,7 +24,7 @@ public class BishopMoves extends FindMoves {
         recurseMove(board,myPosition,myPosition,-1,1,enemy);
         recurseMove(board,myPosition,myPosition,-1,-1,enemy);
 
-        return moves;
+        return this.returnMoves();
     }
 
     Collection<ChessMove> moves;
