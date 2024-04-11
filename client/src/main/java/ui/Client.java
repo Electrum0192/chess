@@ -248,14 +248,14 @@ public class Client {
         int row = Integer.parseInt(in.substring(1));
         int column = 0;
         switch (in.charAt(0)) {
-            case 'A' -> column = 1;
-            case 'B' -> column = 2;
-            case 'C' -> column = 3;
-            case 'D' -> column = 4;
-            case 'E' -> column = 5;
-            case 'F' -> column = 6;
-            case 'G' -> column = 7;
-            case 'H' -> column = 8;
+            case 'A' -> column = 8;
+            case 'B' -> column = 7;
+            case 'C' -> column = 6;
+            case 'D' -> column = 5;
+            case 'E' -> column = 4;
+            case 'F' -> column = 3;
+            case 'G' -> column = 2;
+            case 'H' -> column = 1;
         }
         if(column == 0){
             throw new Exception("Invalid coordinate");

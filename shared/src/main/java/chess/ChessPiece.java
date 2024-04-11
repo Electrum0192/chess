@@ -79,7 +79,7 @@ public class ChessPiece {
         if(move.getEndPosition().getRow() == dashRow){ //&& !hasMoved
             //The pawn is dashing
             canPassant = true;
-            System.out.println("FLAG: Pawn is Dashing");
+            //System.out.println("FLAG: Pawn is Dashing");
         }
     }
 

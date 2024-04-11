@@ -271,7 +271,7 @@ public class ChessGame {
             if(!castling) {
                 //Move the piece
                 currentBoard.movePiece(move);
-                System.out.println(currentBoard.toString());
+                //System.out.println(currentBoard.toString());
                 //Set hasMoved to true
                 currentBoard.getPiece(move.getEndPosition()).hasMoved = true;
             }

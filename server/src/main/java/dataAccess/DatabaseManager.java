@@ -81,7 +81,7 @@ public class DatabaseManager {
                 whiteUsername VARCHAR(255),
                 blackUsername VARCHAR(255),
                 gameName VARCHAR(255),
-                chessGame BLOB NOT NULL
+                chessGame BLOB
             )""";
         try(var createTableStatement = getConnection().prepareStatement(createGameTable)){
             createTableStatement.executeUpdate();

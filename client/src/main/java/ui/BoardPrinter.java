@@ -126,7 +126,7 @@ public class BoardPrinter {
         System.out.println("\u2002 \u2002\u2002A\u2002\u2004\u2004\u2002B\u2002\u2004\u2004\u2002C\u2002\u2004\u2004\u2002D\u2002\u2004\u2004\u2002E\u2002\u2004\u2004\u2002F\u2002\u2004\u2004\u2002G\u2002\u2004\u2004\u2002H");
         HashSet<ChessPosition> showSpaces = null;
         ChessPosition showPiece = null;
-        if(moves != null){
+        if(moves != null && !moves.isEmpty()){
             showSpaces = new HashSet<>();
             for(var i : moves){
                 showSpaces.add(i.getEndPosition());
@@ -145,7 +145,7 @@ public class BoardPrinter {
                     System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 }else{System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);}
                 //Set Background for show-moves spaces
-                if(moves != null){
+                if(moves != null && !moves.isEmpty()){
                     assert showPiece != null;
                     if(showPiece.getRow() == r && showPiece.getColumn() == c){
                         //Space is the origin piece
@@ -219,7 +219,7 @@ public class BoardPrinter {
         System.out.println("\u2002 \u2002\u2002H\u2002\u2004\u2004\u2002G\u2002\u2004\u2004\u2002F\u2002\u2004\u2004\u2002E\u2002\u2004\u2004\u2002D\u2002\u2004\u2004\u2002C\u2002\u2004\u2004\u2002B\u2002\u2004\u2004\u2002A");
         HashSet<ChessPosition> showSpaces = null;
         ChessPosition showPiece = null;
-        if(moves != null){
+        if(moves != null && !moves.isEmpty()){
             showSpaces = new HashSet<>();
             for(var i : moves){
                 showSpaces.add(i.getEndPosition());
@@ -238,7 +238,7 @@ public class BoardPrinter {
                     System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 }else{System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);}
                 //Set Background for show-moves spaces
-                if(moves != null){
+                if(moves != null && !moves.isEmpty()){
                     assert showPiece != null;
                     if(showPiece.getRow() == r && showPiece.getColumn() == c){
                         //Space is the origin piece

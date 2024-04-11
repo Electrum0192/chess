@@ -76,7 +76,7 @@ public class PawnMoves extends FindMoves {
                 ChessPosition left = new ChessPosition(myPosition.getRow(),myPosition.getColumn()-1);
                 if (board.getPiece(left) != null) {
                     if (board.getPiece(left).getPassant()) {
-                        System.out.println("FLAG 1");
+                        //System.out.println("FLAG 1");
                         ChessMove capLeft = new ChessMove(myPosition, upLeft, null);
                         moves.add(capLeft);
                     }
@@ -88,7 +88,7 @@ public class PawnMoves extends FindMoves {
                 ChessPosition right = new ChessPosition(myPosition.getRow(),myPosition.getColumn()+1);
                 if (board.getPiece(right) != null) {
                     if (board.getPiece(right).getPassant()) {
-                        System.out.println("FLAG 2");
+                        //System.out.println("FLAG 2");
                         ChessMove capRight = new ChessMove(myPosition, upRight, null);
                         moves.add(capRight);
                     }
@@ -166,7 +166,7 @@ public class PawnMoves extends FindMoves {
                 ChessPosition left = new ChessPosition(myPosition.getRow(),myPosition.getColumn()-1);
                 if (board.getPiece(left) != null) {
                     if (board.getPiece(left).getPassant()) {
-                        System.out.println("FLAG 3");
+                        //System.out.println("FLAG 3");
                         ChessMove capLeft = new ChessMove(myPosition, upLeft, null);
                         moves.add(capLeft);
                     }
@@ -178,7 +178,7 @@ public class PawnMoves extends FindMoves {
                 ChessPosition right = new ChessPosition(myPosition.getRow(),myPosition.getColumn()+1);
                 if (board.getPiece(right) != null) {
                     if (board.getPiece(right).getPassant()) {
-                        System.out.println("FLAG 4");
+                        //System.out.println("FLAG 4");
                         ChessMove capRight = new ChessMove(myPosition, upRight, null);
                         moves.add(capRight);
                     }
