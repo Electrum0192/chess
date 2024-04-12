@@ -32,8 +32,8 @@ public class GameHandler {
         var gameName = new Gson().fromJson(req.body(), GameName.class);
         try{
             var auth = parseAuth(req,res);
-            GameID ID = new GameID(gameService.createGame(auth,gameName.gameName()));
-            return new Gson().toJson(ID);
+            GameID id = new GameID(gameService.createGame(auth,gameName.gameName()));
+            return new Gson().toJson(id);
         }catch (Exception e){
             var message = new Gson().toJson(new ErrorMessage(e.getMessage()));
             if(e.getMessage().contains("Error: unauthorized")){

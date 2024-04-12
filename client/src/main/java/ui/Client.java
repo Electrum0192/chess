@@ -20,7 +20,7 @@ public class Client {
 
     private static AuthData authData;
     private static String team;
-    private static int ID;
+    private static int id;
 
     private static final Client instance = new Client();
     public static Client getInstance(){return instance;}
@@ -28,7 +28,7 @@ public class Client {
     public Client() {
         authData = new AuthData("null","null");
         team = null;
-        ID = 0;
+        id = 0;
     }
 
     public static void runClient(String serverUrl) throws Exception{
@@ -106,7 +106,7 @@ public class Client {
                                 var joinPlayer = ServerFacade.join(serverUrl, authData.authToken(), Integer.parseInt(command[1]), command[2]);
                                 facade.send(new Gson().toJson(joinPlayer));
                                 System.out.println("Loading game:");
-                                ID = Integer.parseInt(command[1]);
+                                id = Integer.parseInt(command[1]);
                                 setting = "ingame";
                                 team = command[2].toUpperCase();
                             }else{
@@ -115,7 +115,7 @@ public class Client {
                                 facade.send(new Gson().toJson(joinObserver));
                                 System.out.printf("Now observing game #%s.\n",command[1]);
                                 System.out.println("Loading game:");
-                                ID = Integer.parseInt(command[1]);
+                                id = Integer.parseInt(command[1]);
                                 setting = "ingame";
                                 team = "OBSERVER";
                             }
@@ -125,7 +125,7 @@ public class Client {
                             facade.send(new Gson().toJson(joinObserver));
                             System.out.printf("Now observing game #%s.\n",command[1]);
                             System.out.println("Loading game:");
-                            ID = Integer.parseInt(command[1]);
+                            id = Integer.parseInt(command[1]);
                             setting = "ingame";
                             team = "OBSERVER";
 
@@ -151,20 +151,20 @@ public class Client {
                                 BoardPrinter.printBlack(facade.getGame().getBoard(), null);
                             }else{BoardPrinter.printWhite(facade.getGame().getBoard(), null);}
                         } else if (readEqual(action, "Leave")) {
-                            Leave leave = new Leave(authData.authToken(),ID);
+                            Leave leave = new Leave(authData.authToken(), id);
                             facade.send(new Gson().toJson(leave));
                             setting = "LOGGED_IN";
                             team = null;
-                            ID = 0;
+                            id = 0;
                         } else if (readEqual(action, "Move")) {
                             ChessMove newMove = new ChessMove(parsePos(command[1]),parsePos(command[2]));
-                            MakeMove move = new MakeMove(authData.authToken(),ID,newMove);
+                            MakeMove move = new MakeMove(authData.authToken(), id,newMove);
                             facade.send(new Gson().toJson(move));
                         } else if (readEqual(action, "Resign")) {
                             System.out.println("Please confirm that you would like to concede the game (Y/N):");
                             String confirm = scanner.nextLine();
                             if(readEqual(confirm,"Y") || readEqual(confirm, "Yes")) {
-                                Resign resign = new Resign(authData.authToken(), ID);
+                                Resign resign = new Resign(authData.authToken(), id);
                                 facade.send(new Gson().toJson(resign));
                             }else{
                                 System.out.println("Resignation cancelled");
