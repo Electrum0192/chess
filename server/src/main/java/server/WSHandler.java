@@ -90,7 +90,11 @@ public class WSHandler {
                 messageAll(gameID, new LoadGame(game.game()));
                 messageAll(gameID,new Notification(username+" moved "+pieceType+" from "+parsePos(move.getStartPosition())+" to "+parsePos(move.getEndPosition())));
             }catch (InvalidMoveException e){
-                session.getRemote().sendString(new Gson().toJson(new Error("Move is invalid")));
+                if(e.getMessage().equals("Move impossible, the game has ended.")) {
+                    session.getRemote().sendString(new Gson().toJson(new Error(e.getMessage())));
+                }else{
+                    session.getRemote().sendString(new Gson().toJson(new Error("Move is invalid")));
+                }
             }
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.LEAVE)) {
             //Remove player from group for that game
@@ -116,7 +120,16 @@ public class WSHandler {
             String notif = username+" has left the game";
             messageAll(leave.getGameID(), new Notification(notif));
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.RESIGN)) {
-            session.getRemote().sendString("TODO: RESIGN");
+            Resign resign = new Gson().fromJson(message, Resign.class);
+            //End the game
+            SQLGameDAO gameDAO = new SQLGameDAO();
+            GameData game = gameDAO.getGame(resign.getGameID());
+            game.game().setGameOver(true);
+            gameDAO.updateGame(resign.getGameID(), new Gson().toJson(game.game()));
+            //Notify Players
+            messageAll(resign.getGameID(), new LoadGame(game.game()));
+            String notif = usernameBackup+" has forfeited. Congratulations, the game is now over.";
+            messageAll(resign.getGameID(), new Notification(notif));
         }
     }
 

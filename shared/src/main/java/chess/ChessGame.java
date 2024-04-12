@@ -225,7 +225,12 @@ public class ChessGame {
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
+    public void makeMove(ChessMove move) throws InvalidMoveException{
+        //Check that the game has not ended
+        if(gameOver){
+            throw new InvalidMoveException("Move impossible, the game has ended.");
+        }
+
         //Check that there is a piece there
         if(currentBoard.getPiece(move.getStartPosition()) != null){
             //Check whose turn it is
@@ -360,6 +365,10 @@ public class ChessGame {
         return currentBoard;
     }
 
+    public void setGameOver(boolean isOver){gameOver = isOver;}
+
     private ChessGame.TeamColor activePlayer;
     private ChessBoard currentBoard;
+
+    private boolean gameOver;
 }

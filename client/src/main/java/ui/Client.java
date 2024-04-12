@@ -166,9 +166,6 @@ public class Client {
                             if(readEqual(confirm,"Y") || readEqual(confirm, "Yes")) {
                                 Resign resign = new Resign(authData.authToken(), ID);
                                 facade.send(new Gson().toJson(resign));
-                                setting = "LOGGED_IN";
-                                team = null;
-                                ID = 0;
                             }else{
                                 System.out.println("Resignation cancelled");
                             }
