@@ -26,7 +26,7 @@ import java.util.HashSet;
 public class WSHandler {
 
     int gameIDBackup = 0;
-    String authBackup = "";
+    String usernameBackup = "";
     Session me = null;
 
     @OnWebSocketMessage
@@ -37,10 +37,6 @@ public class WSHandler {
             //Add session to group for that game
             JoinPlayer joinPlayer = new Gson().fromJson(message, JoinPlayer.class);
             Server.addPlayer(joinPlayer.getGameID(),session);
-            //Make backups to remove player in case of crash
-            gameIDBackup = joinPlayer.getGameID();
-            authBackup = joinPlayer.getAuthString();
-            me = session;
             //Send LoadGame to user
             ChessGame game = new SQLGameDAO().getGame(joinPlayer.getGameID()).game();
             session.getRemote().sendString(new Gson().toJson(new LoadGame(game)));
@@ -53,14 +49,14 @@ public class WSHandler {
                 notif = username+" has joined the game as Black";
             }
             messageAll(joinPlayer.getGameID(), new Notification(notif));
+            //Make backups to remove player in case of crash
+            gameIDBackup = joinPlayer.getGameID();
+            usernameBackup = username;
+            me = session;
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.JOIN_OBSERVER)) {
             //Add session to group for that game
             JoinObserver joinObserver = new Gson().fromJson(message, JoinObserver.class);
             Server.addPlayer(joinObserver.getGameID(),session);
-            //Make backups to remove player in case of crash
-            gameIDBackup = joinObserver.getGameID();
-            authBackup = joinObserver.getAuthString();
-            me = session;
             //Send LoadGame to user
             ChessGame game = new SQLGameDAO().getGame(joinObserver.getGameID()).game();
             session.getRemote().sendString(new Gson().toJson(new LoadGame(game)));
@@ -68,6 +64,10 @@ public class WSHandler {
             String username = new SQLAuthDAO().getAuth(joinObserver.getAuthString()).username();
             String notif = username+" has joined the game as an observer";
             messageAll(joinObserver.getGameID(), new Notification(notif));
+            //Make backups to remove player in case of crash
+            gameIDBackup = joinObserver.getGameID();
+            usernameBackup = username;
+            me = session;
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)) {
             //Get move from command
             MakeMove moveCommand = new Gson().fromJson(message, MakeMove.class);
@@ -125,15 +125,14 @@ public class WSHandler {
         if(session.equals(me)) {
             Server.removePlayer(gameIDBackup, session);
             //Remove player from game list for that game, if applicable
-            String username = new SQLAuthDAO().getAuth(authBackup).username();
             ChessGame.TeamColor team = null;
             SQLGameDAO gameDAO = new SQLGameDAO();
             if (gameDAO.getGame(gameIDBackup).whiteUsername() != null) {
-                if (gameDAO.getGame(gameIDBackup).whiteUsername().equals(username)) {
+                if (gameDAO.getGame(gameIDBackup).whiteUsername().equals(usernameBackup)) {
                     team = ChessGame.TeamColor.WHITE;
                 }
-            } else if (gameDAO.getGame(gameIDBackup).blackUsername().equals(username)) {
-                if (gameDAO.getGame(gameIDBackup).blackUsername().equals(username)) {
+            } else if (gameDAO.getGame(gameIDBackup).blackUsername().equals(usernameBackup)) {
+                if (gameDAO.getGame(gameIDBackup).blackUsername().equals(usernameBackup)) {
                     team = ChessGame.TeamColor.BLACK;
                 }
             }
@@ -141,7 +140,7 @@ public class WSHandler {
                 gameDAO.updatePlayers(gameIDBackup, team, null);
             }
             //Notify the other players
-            String notif = username + " has timed out or crashed, and been removed from the game\nreason: " + statusCode + ": " + reason;
+            String notif = usernameBackup + " has timed out or crashed, and been removed from the game\nreason: " + statusCode + ": " + reason;
             messageAll(gameIDBackup, new Notification(notif));
         }
     }

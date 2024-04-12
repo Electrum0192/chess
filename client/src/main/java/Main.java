@@ -1,14 +1,6 @@
-import chess.*;
-import com.google.gson.Gson;
-import model.*;
-import ui.BoardPrinter;
+
 import ui.Client;
 import ui.EscapeSequences;
-import ui.ServerFacade;
-import webSocketMessages.userCommands.*;
-
-import java.util.Collection;
-import java.util.Scanner;
 
 public class Main {
 
