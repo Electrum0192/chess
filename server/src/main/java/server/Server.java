@@ -79,4 +79,8 @@ public class Server {
         return users.get(gameID);
     }
 
+    public static void clearPlayers(){
+        users.clear();
+    }
+
 }

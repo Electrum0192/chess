@@ -15,6 +15,7 @@ public class UserHandler {
             userService.clearUsers();
             GameService gameService = new GameService();
             gameService.clearGames();
+            Server.clearPlayers();
             return new Gson().toJson(null);
         }
         catch (Exception e){

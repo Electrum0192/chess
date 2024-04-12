@@ -366,6 +366,7 @@ public class ChessGame {
     }
 
     public void setGameOver(boolean isOver){gameOver = isOver;}
+    public boolean isGameOver(){return gameOver;}
 
     private ChessGame.TeamColor activePlayer;
     private ChessBoard currentBoard;

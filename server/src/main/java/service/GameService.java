@@ -71,20 +71,25 @@ public class GameService {
         if(access.getGame(gameID) == null){
             throw new Exception("Error: bad request");
         }
-        //Is requested color open
+        //Is requested color open (or is the player already the same player)
+        AuthData auth = authAccess.getAuth(authToken);
+        String username = auth.username();
+
         if(requestColor == ChessGame.TeamColor.WHITE){
             if(access.getGame(gameID).whiteUsername() != null){
-                throw new Exception("Error: already taken");
+                if(!username.equals(access.getGame(gameID).whiteUsername())) {
+                    throw new Exception("Error: already taken");
+                }
             }
         }else if(requestColor == ChessGame.TeamColor.BLACK){
             if(access.getGame(gameID).blackUsername() != null){
-                throw new Exception("Error: already taken");
+                if(!username.equals(access.getGame(gameID).blackUsername())) {
+                    throw new Exception("Error: already taken");
+                }
             }
         }
 
         //Join Game
-        AuthData auth = authAccess.getAuth(authToken);
-        String username = auth.username();
         GameData game = access.getGame(gameID);
         GameData newGame;
         if(requestColor == ChessGame.TeamColor.WHITE){

@@ -34,36 +34,89 @@ public class WSHandler {
         //Decode message to a UserGameCommand
         var command = new Gson().fromJson(message, UserGameCommand.class);
         if(command.getCommandType().equals(UserGameCommand.CommandType.JOIN_PLAYER)){
-            //Add session to group for that game
             JoinPlayer joinPlayer = new Gson().fromJson(message, JoinPlayer.class);
+            //Check that gameID is valid
+            GameData game = new SQLGameDAO().getGame(joinPlayer.getGameID());
+            if(game == null){
+                Error error = new Error("Requested game does not exist.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            //Check that the user is authorized for this team
+            AuthData auth = new SQLAuthDAO().getAuth(joinPlayer.getAuthString());
+            if(auth == null){
+                Error error = new Error("You are not authorized.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+
+            String username = auth.username();
+            if(joinPlayer.getPlayerColor().equals(ChessGame.TeamColor.WHITE)){
+                if(game.whiteUsername() == null){
+                    Error error = new Error("You are not authorized for requested team.");
+                    session.getRemote().sendString(new Gson().toJson(error));
+                    return;
+                }
+                if(!game.whiteUsername().equals(username)){
+                    Error error = new Error("You are not authorized for requested team.");
+                    session.getRemote().sendString(new Gson().toJson(error));
+                    return;
+                }
+            }
+            if(joinPlayer.getPlayerColor().equals(ChessGame.TeamColor.BLACK)){
+                if(game.blackUsername() == null){
+                    Error error = new Error("You are not authorized for requested team.");
+                    session.getRemote().sendString(new Gson().toJson(error));
+                    return;
+                }
+                if(!game.blackUsername().equals(username)){
+                    Error error = new Error("You are not authorized for requested team.");
+                    session.getRemote().sendString(new Gson().toJson(error));
+                    return;
+                }
+            }
+            //Add session to group for that game
             Server.addPlayer(joinPlayer.getGameID(),session);
             //Send LoadGame to user
-            ChessGame game = new SQLGameDAO().getGame(joinPlayer.getGameID()).game();
-            session.getRemote().sendString(new Gson().toJson(new LoadGame(game)));
+            session.getRemote().sendString(new Gson().toJson(new LoadGame(game.game())));
             //Send Message to all users that player has joined the game
-            String username = new SQLAuthDAO().getAuth(joinPlayer.getAuthString()).username();
             String notif = "";
             if(joinPlayer.getPlayerColor().equals(ChessGame.TeamColor.WHITE)){
                 notif = username+" has joined the game as White";
             }else{
                 notif = username+" has joined the game as Black";
             }
-            messageAll(joinPlayer.getGameID(), new Notification(notif));
+            messageOthers(joinPlayer.getGameID(), new Notification(notif), session);
             //Make backups to remove player in case of crash
             gameIDBackup = joinPlayer.getGameID();
             usernameBackup = username;
             me = session;
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.JOIN_OBSERVER)) {
-            //Add session to group for that game
             JoinObserver joinObserver = new Gson().fromJson(message, JoinObserver.class);
+
+            //Check that gameID is valid
+            GameData game = new SQLGameDAO().getGame(joinObserver.getGameID());
+            if(game == null){
+                Error error = new Error("Requested game does not exist.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            //Check that the user is authorized for this team
+            AuthData auth = new SQLAuthDAO().getAuth(joinObserver.getAuthString());
+            if(auth == null){
+                Error error = new Error("You are not authorized.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+
+            //Add session to group for that game
             Server.addPlayer(joinObserver.getGameID(),session);
             //Send LoadGame to user
-            ChessGame game = new SQLGameDAO().getGame(joinObserver.getGameID()).game();
-            session.getRemote().sendString(new Gson().toJson(new LoadGame(game)));
+            session.getRemote().sendString(new Gson().toJson(new LoadGame(game.game())));
             //Send Message to all users that player has joined the game
             String username = new SQLAuthDAO().getAuth(joinObserver.getAuthString()).username();
             String notif = username+" has joined the game as an observer";
-            messageAll(joinObserver.getGameID(), new Notification(notif));
+            messageOthers(joinObserver.getGameID(), new Notification(notif), session);
             //Make backups to remove player in case of crash
             gameIDBackup = joinObserver.getGameID();
             usernameBackup = username;
@@ -73,28 +126,39 @@ public class WSHandler {
             MakeMove moveCommand = new Gson().fromJson(message, MakeMove.class);
             ChessMove move = moveCommand.getMove();
             int gameID = moveCommand.getGameID();
-            //Check that the move is valid, make the move if it is
+            //Check that the move is given by the correct player
             SQLGameDAO gameDAO = new SQLGameDAO();
             GameData game = gameDAO.getGame(gameID);
-            String username = null;
-            if(game.game().getTeamTurn().equals(ChessGame.TeamColor.WHITE)){
-                username = game.whiteUsername();
-            }else if(game.game().getTeamTurn().equals(ChessGame.TeamColor.BLACK)){
-                username = game.blackUsername();
-            }else{username = "Server";}
+            String username = new SQLAuthDAO().getAuth(moveCommand.getAuthString()).username();
+            if(username.equals(game.whiteUsername()) && game.game().getTeamTurn().equals(ChessGame.TeamColor.BLACK)){
+                Error error = new Error("It is not your turn.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            } else if (username.equals(game.blackUsername()) && game.game().getTeamTurn().equals(ChessGame.TeamColor.WHITE)) {
+                Error error = new Error("It is not your turn.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            } else if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                Error error = new Error("Observers cannot make moves.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            //Check that the move is valid, make the move if it is
+
             String pieceType = game.game().getBoard().getPiece(move.getStartPosition()).getPieceType().toString();
             try {
                 game.game().makeMove(move);
                 //Update the server and the players
                 gameDAO.updateGame(gameID,new Gson().toJson(game.game()));
                 messageAll(gameID, new LoadGame(game.game()));
-                messageAll(gameID,new Notification(username+" moved "+pieceType+" from "+parsePos(move.getStartPosition())+" to "+parsePos(move.getEndPosition())));
+                messageOthers(gameID,new Notification(username+" moved "+pieceType+" from "+parsePos(move.getStartPosition())+" to "+parsePos(move.getEndPosition())), session);
             }catch (InvalidMoveException e){
-                if(e.getMessage().equals("Move impossible, the game has ended.")) {
+                if(e.getMessage() != null) {
                     session.getRemote().sendString(new Gson().toJson(new Error(e.getMessage())));
                 }else{
-                    session.getRemote().sendString(new Gson().toJson(new Error("Move is invalid")));
+                    session.getRemote().sendString(new Gson().toJson(new Error("Move impossible, the game has ended.")));
                 }
+
             }
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.LEAVE)) {
             //Remove player from group for that game
@@ -118,52 +182,59 @@ public class WSHandler {
             }
             //Notify the other players
             String notif = username+" has left the game";
-            messageAll(leave.getGameID(), new Notification(notif));
+            messageOthers(leave.getGameID(), new Notification(notif), session);
         } else if (command.getCommandType().equals(UserGameCommand.CommandType.RESIGN)) {
             Resign resign = new Gson().fromJson(message, Resign.class);
-            //End the game
+            //Check that user is not an observer
             SQLGameDAO gameDAO = new SQLGameDAO();
             GameData game = gameDAO.getGame(resign.getGameID());
+            String username = new SQLAuthDAO().getAuth(resign.getAuthString()).username();
+            if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                Error error = new Error("Observers cannot resign.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            //Check that game has not already ended
+            if(game.game().isGameOver()){
+                Error error = new Error("Game is already over.");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            //End the game
             game.game().setGameOver(true);
             gameDAO.updateGame(resign.getGameID(), new Gson().toJson(game.game()));
             //Notify Players
-            messageAll(resign.getGameID(), new LoadGame(game.game()));
             String notif = usernameBackup+" has forfeited. Congratulations, the game is now over.";
             messageAll(resign.getGameID(), new Notification(notif));
-        }
-    }
-
-    @OnWebSocketClose
-    public void onClose(Session session, int statusCode, String reason) throws Exception{
-        if(session.equals(me)) {
-            Server.removePlayer(gameIDBackup, session);
-            //Remove player from game list for that game, if applicable
-            ChessGame.TeamColor team = null;
-            SQLGameDAO gameDAO = new SQLGameDAO();
-            if (gameDAO.getGame(gameIDBackup).whiteUsername() != null) {
-                if (gameDAO.getGame(gameIDBackup).whiteUsername().equals(usernameBackup)) {
-                    team = ChessGame.TeamColor.WHITE;
-                }
-            } else if (gameDAO.getGame(gameIDBackup).blackUsername().equals(usernameBackup)) {
-                if (gameDAO.getGame(gameIDBackup).blackUsername().equals(usernameBackup)) {
-                    team = ChessGame.TeamColor.BLACK;
-                }
-            }
-            if (team != null) {
-                gameDAO.updatePlayers(gameIDBackup, team, null);
-            }
-            //Notify the other players
-            String notif = usernameBackup + " has timed out or crashed, and been removed from the game\nreason: " + statusCode + ": " + reason;
-            messageAll(gameIDBackup, new Notification(notif));
         }
     }
 
     private void messageAll(int gameID, ServerMessage serverMessage) throws IOException {
         HashSet<Session> sessions = Server.getSessions(gameID);
         String message = new Gson().toJson(serverMessage);
-        if(sessions != null) {
+        if(sessions != null && !sessions.isEmpty()) {
             for (var i : sessions) {
-                i.getRemote().sendString(message);
+                if(i.isOpen()) {
+                    i.getRemote().sendString(message);
+                }else{
+                    Server.removePlayer(gameID, i);
+                }
+            }
+        }
+    }
+
+    private void messageOthers(int gameID, ServerMessage serverMessage, Session me) throws IOException{
+        HashSet<Session> sessions = Server.getSessions(gameID);
+        String message = new Gson().toJson(serverMessage);
+        if(sessions != null && !sessions.isEmpty()) {
+            for (var i : sessions) {
+                if(!i.equals(me)) {
+                    if(i.isOpen()) {
+                        i.getRemote().sendString(message);
+                    }else{
+                        Server.removePlayer(gameID, i);
+                    }
+                }
             }
         }
     }
